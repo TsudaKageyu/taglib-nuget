@@ -95,7 +95,7 @@ $taglibDir = Join-Path $sourceDir "taglib-1.9.1"
 $zlibUrl = "http://zlib.net/zlib128.zip"
 $zlibDir = Join-Path $sourceDir "zlib-1.2.8"
 
-$workDir      = Join-Path $tempDir "work"
+$workBaseDir  = Join-Path $tempDir "work"
 $libBaseDir   = Join-Path $thisDir "package\lib\native"
 $buildBaseDir = Join-Path $thisDir "package\build\native"
 
@@ -117,8 +117,8 @@ if (-not (Test-Path $zlibDir)) {
     extract $f
 }
 
-if (Test-Path $workDir) {
-    Remove-Item -Path $workDir -Recurse -Force
+if (Test-Path $workBaseDir) {
+    Remove-Item -Path $workBaseDir -Recurse -Force
 }
 
 if (Test-Path $libBaseDir) {
@@ -269,7 +269,7 @@ $i = 1
 
             # Build zlib as a static library.
 
-            $workDir = Join-Path $workDir "$platform\$toolset\$config"
+            $WorkDir = Join-Path $workBaseDir "$platform\$toolset\$config"
             $zlibWorkDir = Join-Path $workDir "zlib"
             New-Item -Path $zlibWorkDir -ItemType directory | Out-Null
 
