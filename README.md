@@ -1,4 +1,3 @@
 taglib-nuget
 ============
-
-NuGet package for TagLib
+Tools for maintenance of NuGet package for [TagLib Audio Meta-Data Library](http://taglib.github.io/)
