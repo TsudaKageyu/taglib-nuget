@@ -139,6 +139,7 @@
         <file src="package\lib\native\include\audioproperties.h" target="lib\native\include\audioproperties.h" />
         <file src="package\lib\native\include\fileref.h" target="lib\native\include\fileref.h" />
         <file src="package\lib\native\include\tag.h" target="lib\native\include\tag.h" />
+        <file src="package\lib\native\include\taglib_config.h" target="lib\native\include\taglib_config.h" />
         <file src="package\lib\native\include\taglib_export.h" target="lib\native\include\taglib_export.h" />
         <file src="package\lib\native\lib\Win32\v100\taglib.lib" target="lib\native\lib\Win32\v100\taglib.lib" />
         <file src="package\lib\native\lib\Win32\v100\taglibd.lib" target="lib\native\lib\Win32\v100\taglibd.lib" />

@@ -177,18 +177,8 @@ foreach ($header in $lines[33..131])
     }
 }
 
-# Apply patches to taglib.h and tiostream.h.
-# Workaround for TagLib1.x. Will be removed in TagLib2.0.
-
-$fileName = Join-Path $headerDstDir "toolkit\taglib.h"
-$lines = Get-Content -Path $fileName -Encoding UTF8
-if (($lines.Length -ne 170) -or `
-    ($lines[28] -ne "#include ""taglib_config.h""")) {
-    showMsg "Can't apply a patch to taglib.h!"
-}
-
-$lines[28] = "//#include ""taglib_config.h"""
-$lines | Set-Content -Path $fileName -Encoding UTF8
+# Apply a patch to tiostream.h.
+# Workaround for Warning C4251. Should be removed in TagLib2.0.
 
 $fileName = Join-Path $headerDstDir "toolkit\tiostream.h"
 $lines = (Get-Content -Path $fileName -Encoding UTF8)
@@ -281,7 +271,6 @@ $i = 1
                 $generator += " Win64"
             }
 
-
             # Build zlib as a static library.
 
             $WorkDir = Join-Path $workBaseDir "$platform\$toolset\$config"
@@ -360,6 +349,11 @@ $i = 1
 
             $src = Join-Path $taglibWorkDir "taglib\$config\taglib$suffix.lib"
             Copy-Item $src $libOutDir
+
+            if ($i -eq 1) {
+                $src = Join-Path $taglibWorkDir "taglib_config.h"
+                Copy-Item $src $headerDstDir
+            }
 
             # Add a reference to the binary files to the targets file.
 
