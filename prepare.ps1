@@ -288,15 +288,6 @@ $i = 1
             $zlibProject = Join-Path $zlibWorkDir "zlibstatic.vcxproj"
             Copy-Item (Join-Path $zlibDir "*.h") $zlibWorkDir
 
-            # I couldn't override some propreties of the TagLib project with
-            # MSBuild for some reason. So modify the project file directly.
-
-            $content = (Get-Content -Path $zlibProject -Encoding UTF8)
-            $content = $content -Replace `
-                "<DebugInformationFormat>.*</DebugInformationFormat>", `
-                "<DebugInformationFormat></DebugInformationFormat>"
-            $content | Set-Content -Path $zlibProject -Encoding UTF8
-
             $params  = """$zlibProject"" "
             $params += "/p:VisualStudioVersion=$vsVer "
             $params += "/p:Configuration=$config "
@@ -324,10 +315,10 @@ $i = 1
 
             $taglibProject = Join-Path $taglibWorkDir "taglib\tag.vcxproj"
 
+            # I couldn't override some propreties of the TagLib project with
+            # MSBuild for some reason. So modify the project file directly.
+
             $content = (Get-Content -Path $taglibProject -Encoding UTF8)
-            $content = $content -Replace `
-                "<DebugInformationFormat>.*</DebugInformationFormat>", `
-                "<DebugInformationFormat></DebugInformationFormat>"
             $content = $content -Replace "Level3",    "TurnOffAllWarnings"
             $content = $content -Replace "MultiByte", "Unicode"
             $content = $content -Replace "tag.lib",   "taglib$suffix.lib"
