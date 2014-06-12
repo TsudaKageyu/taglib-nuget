@@ -1,4 +1,4 @@
-# This script prepares all the required files for the NuGet package.
+﻿# This script prepares all the required files for the NuGet package.
 # * .targets file
 # * Header files
 # * DLL and import library files
@@ -337,15 +337,27 @@ $i = 1
             $content = $content -Replace "MultiByte", "Unicode"
             $content = $content -Replace "tag.lib",   "taglib$suffix.lib"
             $content = $content -Replace "tag.pdb",   "taglib$suffix.pdb"
+
+            $lineNo = $content.Length - 1
+            if ($content[$lineNo] -eq "</Project>") {
+                $content[$lineNo] `
+                    = "<ItemGroup><ResourceCompile Include=""dllversion.rc"" />" `
+                    + "</ItemGroup></Project>"
+            }
+            else {
+                showMsg "Error modifying project file."
+            }
+
             $content | Set-Content -Path $taglibProject -Encoding UTF8
+
+            Copy-Item (Join-Path $thisDir "dllversion.rc") `
+                (Join-Path $taglibWorkDir "taglib")
 
             $params  = """$taglibProject"" "
             $params += "/p:VisualStudioVersion=$vsVer "
             $params += "/p:Configuration=$config "
             $params += "/p:TargetName=taglib$suffix "
             execute $msbuildExe $params $taglibWorkDir
-
-            $taglibLib = Join-Path $taglibWorkDir "taglib\$config\taglib$suffix.lib"
 
             # Copy necessary files
 
