@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 # MSBuild Settings
 
 Set-Variable -Name Toolsets -Option Constant -Value @(
-    "v100", "v110", "v110_xp", "v120", "v120_xp"
+    "v90", "v100", "v110", "v110_xp", "v120", "v120_xp"
 )
 
 Set-Variable -Name Platforms -Option Constant -Value @(
@@ -267,12 +267,20 @@ $i = 1
 
             # CMake and MsBuid parameters.
 
-            $generator = "Visual Studio " + $toolset.Substring(1, 2)
+            $generator = "Visual Studio ";
+            $vsVer = ""
+            if ($toolset -eq "v90") {
+                $generator += "10"
+                $vsVer = "10.0"
+            }
+            else {
+                $generator += $toolset.Substring(1, 2)
+                $vsVer = $toolset.Substring(1, 2) + ".0"
+            }
             if ($platform -eq "x64") {
                 $generator += " Win64"
             }
 
-            $vsVer = $toolset.Substring(1, 2) + ".0"
 
             # Build zlib as a static library.
 
