@@ -131,33 +131,37 @@ if (Test-Path $buildBaseDir) {
     Remove-Item -Path $buildBaseDir -Recurse -Force
 }
 
+# Check TagLib version.
+
+$fileName = Join-Path $taglibDir "CMakeLists.txt"
+$lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
+
+if ($lines.Length -ne 120 `
+    -or $lines[48] -ne 'set(TAGLIB_LIB_MAJOR_VERSION "1")' `
+    -or $lines[49] -ne 'set(TAGLIB_LIB_MINOR_VERSION "9")' `
+    -or $lines[50] -ne 'set(TAGLIB_LIB_PATCH_VERSION "1")')
+{
+    showMsg "TagLib version mismatch!"
+    exit
+}
+
 # Copy the header files which should be installed.
 
 $headerSrcDir = Join-Path $taglibDir  "taglib"
 $headerDstDir = Join-Path $libBaseDir "include"
 
-$lines = (Get-Content -Path (Join-Path $taglibDir "taglib\CMakeLists.txt") -Encoding UTF8)
-$lines = $lines.Trim()
+$fileName = Join-Path $taglibDir "taglib\CMakeLists.txt"
+$lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-$firstLine = -1;
-$lastLine  = -1;
-for ($i = 0; $i -lt $lines.Length; ++$i)
+if ($lines.Length -ne 335 `
+    -or $lines[32]  -ne "set(tag_HDRS" `
+    -or $lines[132] -ne ")")
 {
-    $l = $lines[$i];
-    if ($l -eq "set(tag_HDRS") {
-        $firstLine = $i + 1;
-    }
-    elseif (($firstLine -ne -1) -and ($l -eq ")")) {
-        $lastLine = $i - 1;
-        break;
-    }
-}
-if (($firstLine -eq -1) -or ($lastLine -eq -1)) {
-    showMsg "CMakeLists.txt parse error."
+    showMsg "Error reading taglib/CMakeLists.txt (header files)!"
+    exit
 }
 
-$headers = $lines[$firstLine..$lastLine]
-foreach ($header in $headers)
+foreach ($header in $lines[33..131])
 {
     if ($header -eq '${CMAKE_BINARY_DIR}/taglib_config.h') {
         # Skip it. taglib_config.h is no longer used.
@@ -177,7 +181,7 @@ foreach ($header in $headers)
 # Workaround for TagLib1.x. Will be removed in TagLib2.0.
 
 $fileName = Join-Path $headerDstDir "toolkit\taglib.h"
-$lines = (Get-Content -Path $fileName -Encoding UTF8)
+$lines = Get-Content -Path $fileName -Encoding UTF8
 if (($lines.Length -ne 170) -or `
     ($lines[28] -ne "#include ""taglib_config.h""")) {
     showMsg "Can't apply a patch to taglib.h!"
@@ -215,28 +219,19 @@ $targetsContent += @"
       <AdditionalIncludeDirectories>
 "@
 
-$lines = (Get-Content -Path (Join-Path $taglibDir "taglib\CMakeLists.txt") -Encoding UTF8)
-$lines = $lines.Trim()
+$fileName = Join-Path $taglibDir "taglib\CMakeLists.txt"
+$lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-$firstLine = -1;
-$lastLine  = -1;
-for ($i = 0; $i -lt $lines.Length; ++$i)
+if ($lines[0] -ne "set(CMAKE_INCLUDE_CURRENT_DIR ON)" `
+    -or $lines[1] -ne "include_directories(" `
+    -or $lines[26] -ne ")")
 {
-    $l = $lines[$i];
-    if ($l -eq "include_directories(") {
-        $firstLine = $i + 1;
-    }
-    elseif (($firstLine -ne -1) -and ($l -eq ")")) {
-        $lastLine = $i - 1;
-        break;
-    }
-}
-if (($firstLine -eq -1) -or ($lastLine -eq -1)) {
-    showMsg "CMakeLists.txt parse error."
+    showMsg "Error reading taglib/CMakeLists.txt (include directories)!"
+    exit
 }
 
 $dirs = @("")
-$dirs += $lines[$firstLine..$lastLine].Replace('${CMAKE_CURRENT_SOURCE_DIR}', "")
+$dirs += $lines[2..25].Replace('${CMAKE_CURRENT_SOURCE_DIR}', "")
 foreach ($dir in $dirs)
 {
     $tmp = Join-Path "`$(MSBuildThisFileDirectory)..\..\lib\native\include" $dir
