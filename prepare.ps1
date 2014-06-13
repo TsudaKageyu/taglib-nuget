@@ -289,6 +289,7 @@ $i = 1
             $params += "/p:VisualStudioVersion=$vsVer "
             $params += "/p:Configuration=$config "
             $params += "/p:TargetName=zlib "
+            $params += "/m "
             execute $msbuildExe $params $zlibWorkDir
 
             $zlibLib = Join-Path $zlibWorkDir "$config\zlib.lib"
@@ -340,6 +341,7 @@ $i = 1
             $params += "/p:VisualStudioVersion=$vsVer "
             $params += "/p:Configuration=$config "
             $params += "/p:TargetName=taglib$suffix "
+            $params += "/m "
             execute $msbuildExe $params $taglibWorkDir
 
             # Copy necessary files
