@@ -177,22 +177,6 @@ foreach ($header in $lines[33..131])
     }
 }
 
-# Apply a patch to tiostream.h.
-# Workaround for Warning C4251. Should be removed in TagLib2.0.
-
-$fileName = Join-Path $headerDstDir "toolkit\tiostream.h"
-$lines = (Get-Content -Path $fileName -Encoding UTF8)
-if (($lines.Length -ne 169) -or `
-    ($lines[52] -ne "    const std::string  m_name;") -or `
-    ($lines[53] -ne "    const std::wstring m_wname;")) {
-    showMsg "Can't apply a patch to tiostream.h!"
-}
-
-$lines = $Lines[0..51] + "#pragma warning(push)"          + $Lines[52..168]
-$lines = $Lines[0..52] + "#pragma warning(disable: 4251)" + $Lines[53..169]
-$lines = $Lines[0..55] + "#pragma warning(pop)"           + $Lines[56..170]
-$lines | Set-Content -Path $fileName -Encoding UTF8
-
 # Begin creating the targets file.
 
 $targetsContent = @"
@@ -206,6 +190,7 @@ $targetsContent = @"
 $targetsContent += @"
   <ItemDefinitionGroup>
     <ClCompile>
+      <PreprocessorDefinitions>TAGLIB_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>
 "@
 
