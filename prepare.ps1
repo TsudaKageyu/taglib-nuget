@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 # MSBuild Settings
 
 Set-Variable -Name Toolsets -Option Constant -Value @(
-    "v90", "v100", "v110", "v110_xp", "v120", "v120_xp"
+    "v90", "v100", "v110", "v120"
 )
 
 Set-Variable -Name Platforms -Option Constant -Value @(
@@ -248,9 +248,24 @@ $targetsContent += @"
       <Output TaskParameter="Value" PropertyName="TagLib_RuntimeLink" />
     </CreateProperty>
 
+    <!-- TagLib_ToolSet is toolset except for "_xp" suffix. -->
+
+    <CreateProperty Condition="`$(PlatformToolset.ToLower().IndexOf('v90')) == 0" Value="v90">
+      <Output TaskParameter="Value" PropertyName="TagLib_ToolSet" />
+    </CreateProperty>
+    <CreateProperty Condition="`$(PlatformToolset.ToLower().IndexOf('v100')) == 0" Value="v100">
+      <Output TaskParameter="Value" PropertyName="TagLib_ToolSet" />
+    </CreateProperty>
+    <CreateProperty Condition="`$(PlatformToolset.ToLower().IndexOf('v110')) == 0" Value="v110">
+      <Output TaskParameter="Value" PropertyName="TagLib_ToolSet" />
+    </CreateProperty>
+    <CreateProperty Condition="`$(PlatformToolset.ToLower().IndexOf('v120')) == 0" Value="v120">
+      <Output TaskParameter="Value" PropertyName="TagLib_ToolSet" />
+    </CreateProperty>
+
     <!-- Suffix of lib & dll file like 'win32-v100-mdd' -->
 
-    <CreateProperty Value="`$(Platform.ToLower())-`$(PlatformToolset.ToLower())-`$(TagLib_RuntimeLink)">
+    <CreateProperty Value="`$(Platform.ToLower())-`$(TagLib_ToolSet)-`$(TagLib_RuntimeLink)">
       <Output TaskParameter="Value" PropertyName="TagLib_LibSuffix" />
     </CreateProperty>
 
@@ -307,6 +322,11 @@ $i = 1
                     $runtimeLib += "DLL"
                 }
 
+                $toolsetSuffix = "";
+                if ([int]$vsVer -ge 11) {
+                    $toolsetSuffix = "_xp";
+                }
+
                 # Build zlib as a static library.
 
                 $WorkDir = Join-Path $workBaseDir "$platform\$toolset\$runtime\$config"
@@ -314,7 +334,7 @@ $i = 1
                 New-Item -Path $zlibWorkDir -ItemType directory | Out-Null
 
                 $params  = "-G ""$generator"" "
-                $params += "-T ""$toolset"" "
+                $params += "-T ""$toolset$toolsetSuffix"" "
                 $params += """$zlibDir"" "
                 execute "cmake.exe" $params $zlibWorkDir
 
@@ -350,7 +370,7 @@ $i = 1
                 }
 
                 $params  = "-G ""$generator"" "
-                $params += "-T ""$toolset"" "
+                $params += "-T ""$toolset$toolsetSuffix"" "
                 $params += "-DZLIB_INCLUDE_DIR=""$zlibWorkDir"" "
                 $params += "-DZLIB_LIBRARY=""$zlibLib"" "
                 $params += """$taglibDir"" "
