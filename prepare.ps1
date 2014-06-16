@@ -18,6 +18,10 @@ Set-Variable -Name Platforms -Option Constant -Value @(
     "Win32", "x64"
 )
 
+Set-Variable -Name RuntimeLinks -Option Constant -Value @(
+    "MD", "MT"
+)
+
 Set-Variable -Name Configs -Option Constant -Value @(
     "Debug", "Release"
 )
@@ -216,164 +220,204 @@ foreach ($dir in $dirs)
 $targetsContent += @"
 %(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>`$(MSBuildThisFileDirectory)..\..\lib\native\lib\taglib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
-  <Target Name="TagLib_AfterBuild" AfterTargets="AfterBuild" />
+
+  <Target Name="BeforeClCompile">
+
+    <!-- Check if the runtime link is dynamic or static -->
+
+    <CreateProperty Value="%(ClCompile.RuntimeLibrary)">
+      <Output TaskParameter="Value" PropertyName="TagLib_RuntimeLibrary" />
+    </CreateProperty>
+
+    <!-- TagLib_RuntimeLink corresponds to /MDd, /MD, /MTd and /MT options -->
+
+    <CreateProperty Condition="(`$(TagLib_RuntimeLibrary.ToLower().IndexOf('dll')) &gt; -1) And (`$(Configuration.ToLower().IndexOf('debug')) &gt; -1)" Value="mdd">
+      <Output TaskParameter="Value" PropertyName="TagLib_RuntimeLink" />
+    </CreateProperty>
+    <CreateProperty Condition="(`$(TagLib_RuntimeLibrary.ToLower().IndexOf('dll')) &gt; -1) And (`$(Configuration.ToLower().IndexOf('debug')) == -1)" Value="md">
+      <Output TaskParameter="Value" PropertyName="TagLib_RuntimeLink" />
+    </CreateProperty>
+    <CreateProperty Condition="(`$(TagLib_RuntimeLibrary.ToLower().IndexOf('dll')) == -1) And (`$(Configuration.ToLower().IndexOf('debug')) &gt; -1)" Value="mtd">
+      <Output TaskParameter="Value" PropertyName="TagLib_RuntimeLink" />
+    </CreateProperty>
+    <CreateProperty Condition="(`$(TagLib_RuntimeLibrary.ToLower().IndexOf('dll')) == -1) And (`$(Configuration.ToLower().IndexOf('debug')) == -1)" Value="mt">
+      <Output TaskParameter="Value" PropertyName="TagLib_RuntimeLink" />
+    </CreateProperty>
+
+    <!-- Suffix of lib & dll file like 'win32-v100-mdd' -->
+
+    <CreateProperty Value="`$(Platform.ToLower())-`$(PlatformToolset.ToLower())-`$(TagLib_RuntimeLink)">
+      <Output TaskParameter="Value" PropertyName="TagLib_LibSuffix" />
+    </CreateProperty>
+
 
 "@
 
 # Go through all the platforms, toolsets and configurations.
 
-$count = $Platforms.Length * $Toolsets.Length * $Configs.Length
+$count = $Platforms.Length * $Toolsets.Length * $RuntimeLinks.Length * $Configs.Length
 $i = 1
 
 :toolset foreach ($toolset in $Toolsets)
 {
     foreach ($platform in $Platforms)
     {
-        $binOutDir = Join-Path $libBaseDir "bin\$platform\$toolset"
-        New-Item -Path $binOutDir -ItemType directory | Out-Null
-
-        $libOutDir = Join-Path $libBaseDir "lib\$platform\$toolset"
-        New-Item -Path $libOutDir -ItemType directory | Out-Null
-
-        foreach ($config in $Configs)
+        foreach ($runtime in $RuntimeLinks)
         {
-            showMsg "Start Buiding [$toolset, $platform, $config] ($i/$count)"
+            foreach ($config in $Configs)
+            {
+                showMsg "Start Buiding [$toolset, $platform, $runtime, $config] ($i/$count)"
 
-            # CMake and MsBuid parameters.
+                $libSuffix = "$platform-$toolset-$runtime".ToLower()
+                if ($config -eq "Debug") {
+                    $libSuffix += "d"
+                }
 
-            $generator = "Visual Studio ";
-            $vsVer = ""
-            if ($toolset -eq "v90") {
-                $generator += "10"
-                $vsVer = "10.0"
-            }
-            else {
-                $generator += $toolset.Substring(1, 2)
-                $vsVer = $toolset.Substring(1, 2) + ".0"
-            }
-            if ($platform -eq "x64") {
-                $generator += " Win64"
-            }
+                $binOutDir = Join-Path $libBaseDir (Join-Path "bin" $libSuffix)
+                New-Item -Path $binOutDir -ItemType directory | Out-Null
 
-            # Build zlib as a static library.
+                $libOutDir = Join-Path $libBaseDir (Join-Path "lib" $libSuffix)
+                New-Item -Path $libOutDir -ItemType directory | Out-Null
 
-            $WorkDir = Join-Path $workBaseDir "$platform\$toolset\$config"
-            $zlibWorkDir = Join-Path $workDir "zlib"
-            New-Item -Path $zlibWorkDir -ItemType directory | Out-Null
+                # CMake and MsBuid parameters.
 
-            $params  = "-G ""$generator"" "
-            $params += "-T ""$toolset"" "
-            $params += """$zlibDir"" "
-            execute "cmake.exe" $params $zlibWorkDir
+                $generator = "Visual Studio ";
+                $vsVer = ""
+                if ($toolset -eq "v90") {
+                    $generator += "10"
+                    $vsVer = "10.0"
+                }
+                else {
+                    $generator += $toolset.Substring(1, 2)
+                    $vsVer = $toolset.Substring(1, 2) + ".0"
+                }
+                if ($platform -eq "x64") {
+                    $generator += " Win64"
+                }
 
-            $zlibProject = Join-Path $zlibWorkDir "zlibstatic.vcxproj"
-            Copy-Item (Join-Path $zlibDir "*.h") $zlibWorkDir
+                $runtimeLib = "MultiThreaded"
+                if ($config -eq "Debug") {
+                    $runtimeLib += "Debug"
+                }
+                if ($runtime -eq "MD") {
+                    $runtimeLib += "DLL"
+                }
 
-            $params  = """$zlibProject"" "
-            $params += "/p:VisualStudioVersion=$vsVer "
-            $params += "/p:Configuration=$config "
-            $params += "/p:TargetName=zlib "
-            $params += "/m "
-            execute $msbuildExe $params $zlibWorkDir
+                # Build zlib as a static library.
 
-            $zlibLib = Join-Path $zlibWorkDir "$config\zlib.lib"
+                $WorkDir = Join-Path $workBaseDir "$platform\$toolset\$runtime\$config"
+                $zlibWorkDir = Join-Path $workDir "zlib"
+                New-Item -Path $zlibWorkDir -ItemType directory | Out-Null
 
-            # Build TagLib as a DLL.
+                $params  = "-G ""$generator"" "
+                $params += "-T ""$toolset"" "
+                $params += """$zlibDir"" "
+                execute "cmake.exe" $params $zlibWorkDir
 
-            $taglibWorkDir = Join-Path $workDir "taglib"
-            New-Item -Path $taglibWorkDir -ItemType directory | Out-Null
+                $zlibProject = Join-Path $zlibWorkDir "zlibstatic.vcxproj"
+                Copy-Item (Join-Path $zlibDir "*.h") $zlibWorkDir
 
-            $suffix = ""
-            if ($config -eq "Debug") {
-                $suffix = "d"
-            }
+                # I couldn't override some propreties of the projects with
+                # MSBuild for some reason. So modify the project file directly.
 
-            $params  = "-G ""$generator"" "
-            $params += "-T ""$toolset"" "
-            $params += "-DZLIB_INCLUDE_DIR=""$zlibWorkDir"" "
-            $params += "-DZLIB_LIBRARY=""$zlibLib"" "
-            $params += """$taglibDir"" "
-            execute "cmake.exe" $params $taglibWorkDir
+                $content = (Get-Content -Path $zlibProject -Encoding UTF8)
+                $content = $content -Replace `
+                    "<RuntimeLibrary>.*</RuntimeLibrary>", `
+                    "<RuntimeLibrary>$runtimeLib</RuntimeLibrary>"
+                $content | Set-Content -Path $zlibProject -Encoding UTF8
 
-            $taglibProject = Join-Path $taglibWorkDir "taglib\tag.vcxproj"
+                $params  = """$zlibProject"" "
+                $params += "/p:VisualStudioVersion=$vsVer "
+                $params += "/p:Configuration=$config "
+                $params += "/p:TargetName=zlib "
+                $params += "/m "
+                execute $msbuildExe $params $zlibWorkDir
 
-            # I couldn't override some propreties of the TagLib project with
-            # MSBuild for some reason. So modify the project file directly.
+                $zlibLib = Join-Path $zlibWorkDir "$config\zlib.lib"
 
-            $content = (Get-Content -Path $taglibProject -Encoding UTF8)
-            $content = $content -Replace "Level3",    "TurnOffAllWarnings"
-            $content = $content -Replace "MultiByte", "Unicode"
-            $content = $content -Replace "tag.lib",   "taglib$suffix.lib"
-            $content = $content -Replace "tag.pdb",   "taglib$suffix.pdb"
+                # Build TagLib as a DLL.
 
-            $lineNo = $content.Length - 1
-            if ($content[$lineNo] -eq "</Project>") {
-                $content[$lineNo] `
-                    = "<ItemGroup><ResourceCompile Include=""dllversion.rc"" />" `
-                    + "</ItemGroup></Project>"
-            }
-            else {
-                showMsg "Error modifying project file."
-            }
+                $taglibWorkDir = Join-Path $workDir "taglib"
+                New-Item -Path $taglibWorkDir -ItemType directory | Out-Null
 
-            $content | Set-Content -Path $taglibProject -Encoding UTF8
+                $suffix = ""
+                if ($config -eq "Debug") {
+                    $suffix = "d"
+                }
 
-            Copy-Item (Join-Path $thisDir "dllversion.rc") `
-                (Join-Path $taglibWorkDir "taglib")
+                $params  = "-G ""$generator"" "
+                $params += "-T ""$toolset"" "
+                $params += "-DZLIB_INCLUDE_DIR=""$zlibWorkDir"" "
+                $params += "-DZLIB_LIBRARY=""$zlibLib"" "
+                $params += """$taglibDir"" "
+                execute "cmake.exe" $params $taglibWorkDir
 
-            $params  = """$taglibProject"" "
-            $params += "/p:VisualStudioVersion=$vsVer "
-            $params += "/p:Configuration=$config "
-            $params += "/p:TargetName=taglib$suffix "
-            $params += "/m "
-            execute $msbuildExe $params $taglibWorkDir
+                $taglibProject = Join-Path $taglibWorkDir "taglib\tag.vcxproj"
 
-            # Copy necessary files
+                $content = (Get-Content -Path $taglibProject -Encoding UTF8)
+                $content = $content -Replace `
+                    "<RuntimeLibrary>.*</RuntimeLibrary>", `
+                    "<RuntimeLibrary>$runtimeLib</RuntimeLibrary>"
+                $content = $content -Replace "Level3",    "TurnOffAllWarnings"
+                $content = $content -Replace "MultiByte", "Unicode"
+                $content = $content -Replace "tag.lib",   "taglib.lib"
+                $content = $content -Replace "tag.pdb",   "taglib.pdb"
 
-            $src = Join-Path $taglibWorkDir "taglib\$config\taglib$suffix.dll"
-            Copy-Item $src $binOutDir
+                $lineNo = $content.Length - 1
+                if ($content[$lineNo] -eq "</Project>") {
+                    $content[$lineNo] `
+                        = "<ItemGroup><ResourceCompile Include=""dllversion.rc"" />" `
+                        + "</ItemGroup></Project>"
+                }
+                else {
+                    showMsg "Error modifying project file."
+                }
 
-            $src = Join-Path $taglibWorkDir "taglib\$config\taglib$suffix.lib"
-            Copy-Item $src $libOutDir
+                $content | Set-Content -Path $taglibProject -Encoding UTF8
 
-            if ($i -eq 1) {
-                $src = Join-Path $taglibWorkDir "taglib_config.h"
-                Copy-Item $src $headerDstDir
-            }
+                Copy-Item (Join-Path $thisDir "dllversion.rc") `
+                    (Join-Path $taglibWorkDir "taglib")
 
-            # Add a reference to the binary files to the targets file.
+                $params  = """$taglibProject"" "
+                $params += "/p:VisualStudioVersion=$vsVer "
+                $params += "/p:Configuration=$config "
+                $params += "/p:TargetName=taglib "
+                $params += "/m "
+                execute $msbuildExe $params $taglibWorkDir
 
-            $label = "$platform-$toolset-$config"
+                # Copy necessary files
 
-            $condition  = "'`$(Platform.ToLower())' == '" + $platform.ToLower() + "' "
-            $condition += "And '`$(PlatformToolset.ToLower())' == '" + $toolset.ToLower() + "' "
-            $condition += "And ( `$(Configuration.ToLower().IndexOf('debug')) "
-            if ($config -eq "Debug") {
-                $condition += "&gt; "
-            }
-            else {
-                $condition += "== "
-            }
-            $condition += "-1)"
+                $src = Join-Path $taglibWorkDir "taglib\$config\taglib.dll"
+                Copy-Item $src $binOutDir
 
-            $libPath  = "`$(MSBuildThisFileDirectory)"
-            $libPath += "..\..\lib\native\lib\$platform\$toolset\taglib$suffix.lib"
-            $dllPath  = "`$(MSBuildThisFileDirectory)"
-            $dllPath += "..\..\lib\native\bin\$platform\$toolset\taglib$suffix.dll"
+                $src = Join-Path $taglibWorkDir "taglib\$config\taglib.lib"
+                Copy-Item $src $libOutDir
 
-            $targetsContent += @"
-  <ItemDefinitionGroup Label="$label" Condition="$condition">
-    <Link>
-      <AdditionalDependencies>$libPath;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <Target Name="TagLib_AfterBuild_$label" Label="$label" Condition="$Condition" AfterTargets="TagLib_AfterBuild">
-    <Copy SourceFiles="$dllPath" DestinationFolder="`$(TargetDir)" SkipUnchangedFiles="true" />
-  </Target>
+                if ($i -eq 1) {
+                    $src = Join-Path $taglibWorkDir "taglib_config.h"
+                    Copy-Item $src $headerDstDir
+                }
+
+                # Add a reference to the binary files to the targets file.
+
+                $label = "$platform-$toolset-$config"
+
+                $condition = "`$(TagLib_LibSuffix) == '$libSuffix'"
+                $libPath = "..\..\lib\native\lib\$libSuffix\taglib.lib"
+                $dllPath = "..\..\lib\native\bin\$libSuffix\taglib.dll"
+
+                $targetsContent += @"
+    <Copy Condition="$condition" SourceFiles="`$(MSBuildThisFileDirectory)$libPath" DestinationFolder="`$(MSBuildThisFileDirectory)..\..\lib\native\lib\" />
+    <Copy Condition="$condition" SourceFiles="`$(MSBuildThisFileDirectory)$dllPath" DestinationFolder="`$(TargetDir)" />
 
 "@
-            $i++;
+
+                $i++;
+            }
         }
     }
 }
@@ -381,6 +425,7 @@ $i = 1
 # Finish creating the targets file.
 
 $targetsContent += @"
+  </Target>
 </Project>
 
 "@
