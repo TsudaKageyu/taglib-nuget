@@ -390,8 +390,9 @@ $i = 1
                 $lineNo = $content.Length - 1
                 if ($content[$lineNo] -eq "</Project>") {
                     $content[$lineNo] `
-                        = "<ItemGroup><ResourceCompile Include=""dllversion.rc"" />" `
-                        + "</ItemGroup></Project>"
+                        = "<ItemGroup><ClCompile Include=""dllmain.cpp"" /></ItemGroup>" `
+                        + "<ItemGroup><ResourceCompile Include=""dllversion.rc"" /></ItemGroup>" `
+                        + "</Project>"
                 }
                 else {
                     showMsg "Error modifying project file."
@@ -399,8 +400,9 @@ $i = 1
 
                 $content | Set-Content -Path $taglibProject -Encoding UTF8
 
-                Copy-Item (Join-Path $thisDir "dllversion.rc") `
-                    (Join-Path $taglibWorkDir "taglib")
+                $taglibSrcDir = Join-Path $taglibWorkDir "taglib"
+                Copy-Item (Join-Path $thisDir "src\dllmain.cpp")   $taglibSrcDir
+                Copy-Item (Join-Path $thisDir "src\dllversion.rc") $taglibSrcDir
 
                 $params  = """$taglibProject"" "
                 $params += "/p:VisualStudioVersion=$vsVer "
