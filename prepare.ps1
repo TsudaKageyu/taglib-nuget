@@ -96,8 +96,8 @@ if ($tempDir -eq "" -or $msbuildExe -eq "") {
 # Locate the necessary files.
 
 $sourceDir = Join-Path $tempDir "source"
-$taglibUrl = "https://github.com/taglib/taglib/archive/v1.9.1.zip"
-$taglibDir = Join-Path $sourceDir "taglib-1.9.1"
+$taglibUrl = "https://github.com/TsudaKageyu/taglib/archive/1.9.1-beta5.zip"
+$taglibDir = Join-Path $sourceDir "taglib-1.9.1-beta5"
 $zlibUrl = "http://zlib.net/zlib128.zip"
 $zlibDir = Join-Path $sourceDir "zlib-1.2.8"
 
@@ -140,10 +140,10 @@ if (Test-Path $buildBaseDir) {
 $fileName = Join-Path $taglibDir "CMakeLists.txt"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-if ($lines.Length -ne 120 `
-    -or $lines[48] -ne 'set(TAGLIB_LIB_MAJOR_VERSION "1")' `
-    -or $lines[49] -ne 'set(TAGLIB_LIB_MINOR_VERSION "9")' `
-    -or $lines[50] -ne 'set(TAGLIB_LIB_PATCH_VERSION "1")')
+if ($lines.Length -ne 129 `
+    -or $lines[52] -ne 'set(TAGLIB_LIB_MAJOR_VERSION "1")' `
+    -or $lines[53] -ne 'set(TAGLIB_LIB_MINOR_VERSION "9")' `
+    -or $lines[54] -ne 'set(TAGLIB_LIB_PATCH_VERSION "1")')
 {
     showMsg "TagLib version mismatch!"
     exit
@@ -157,15 +157,15 @@ $headerDstDir = Join-Path $libBaseDir "include"
 $fileName = Join-Path $taglibDir "taglib\CMakeLists.txt"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-if ($lines.Length -ne 335 `
-    -or $lines[32]  -ne "set(tag_HDRS" `
-    -or $lines[132] -ne ")")
+if ($lines.Length -ne 353 `
+    -or $lines[34]  -ne "set(tag_HDRS" `
+    -or $lines[136] -ne ")")
 {
     showMsg "Error reading taglib/CMakeLists.txt (header files)!"
     exit
 }
 
-foreach ($header in $lines[33..131])
+foreach ($header in $lines[35..135])
 {
     if ($header -eq '${CMAKE_BINARY_DIR}/taglib_config.h') {
         # Skip it. taglib_config.h is no longer used.
@@ -287,17 +287,6 @@ $i = 1
             {
                 showMsg "Start Buiding [$toolset, $platform, $runtime, $config] ($i/$count)"
 
-                $libSuffix = "$platform-$toolset-$runtime".ToLower()
-                if ($config -eq "Debug") {
-                    $libSuffix += "d"
-                }
-
-                $binOutDir = Join-Path $libBaseDir (Join-Path "bin" $libSuffix)
-                New-Item -Path $binOutDir -ItemType directory | Out-Null
-
-                $libOutDir = Join-Path $libBaseDir (Join-Path "lib" $libSuffix)
-                New-Item -Path $libOutDir -ItemType directory | Out-Null
-
                 # CMake and MsBuid parameters.
 
                 $generator = "Visual Studio ";
@@ -322,14 +311,24 @@ $i = 1
                     $runtimeLib += "DLL"
                 }
 
+                $suffix = ""
+                if ($config -eq "Debug") {
+                    $suffix = "d"
+                }
+
+                $libSuffix = "$platform-$toolset-$runtime$suffix".ToLower()
+
                 $toolsetSuffix = "";
                 if ([int]$vsVer -ge 11) {
                     $toolsetSuffix = "_xp";
                 }
 
-                # Build zlib as a static library.
+                $zlibDirC = $zlibDir.Replace("\", "/")
 
                 $WorkDir = Join-Path $workBaseDir "$platform\$toolset\$runtime\$config"
+
+                # Build zlib as a static library.
+                <#
                 $zlibWorkDir = Join-Path $workDir "zlib"
                 New-Item -Path $zlibWorkDir -ItemType directory | Out-Null
 
@@ -358,21 +357,18 @@ $i = 1
                 execute $msbuildExe $params $zlibWorkDir
 
                 $zlibLib = Join-Path $zlibWorkDir "$config\zlib.lib"
-
+                #>
                 # Build TagLib as a DLL.
 
                 $taglibWorkDir = Join-Path $workDir "taglib"
                 New-Item -Path $taglibWorkDir -ItemType directory | Out-Null
 
-                $suffix = ""
-                if ($config -eq "Debug") {
-                    $suffix = "d"
-                }
 
                 $params  = "-G ""$generator"" "
                 $params += "-T ""$toolset$toolsetSuffix"" "
-                $params += "-DZLIB_INCLUDE_DIR=""$zlibWorkDir"" "
-                $params += "-DZLIB_LIBRARY=""$zlibLib"" "
+                #$params += "-DZLIB_INCLUDE_DIR=""$zlibWorkDir"" "
+                #$params += "-DZLIB_LIBRARY=""$zlibLib"" "
+                $params += "-DZLIB_SOURCE=""$zlibDirC"" "
                 $params += """$taglibDir"" "
                 execute "cmake.exe" $params $taglibWorkDir
 
@@ -412,6 +408,12 @@ $i = 1
                 execute $msbuildExe $params $taglibWorkDir
 
                 # Copy necessary files
+
+                $binOutDir = Join-Path $libBaseDir (Join-Path "bin" $libSuffix)
+                New-Item -Path $binOutDir -ItemType directory | Out-Null
+
+                $libOutDir = Join-Path $libBaseDir (Join-Path "lib" $libSuffix)
+                New-Item -Path $libOutDir -ItemType directory | Out-Null
 
                 $src = Join-Path $taglibWorkDir "taglib\$config\taglib.dll"
                 Copy-Item $src $binOutDir

@@ -2,15 +2,16 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>taglibcpp</id>
-        <version>1.9.1-beta4</version>
+        <version>1.9.1-beta5</version>
         <title>TagLib (C++)</title>
         <authors>Tsuda Kageyu,TagLib Team</authors>
         <owners>Scott Wheeler,Lukáš Lalinský,et al</owners>
-        <licenseUrl>http://www.gnu.org/licenses/lgpl.html</licenseUrl>
         <projectUrl>http://taglib.github.io/</projectUrl>
         <iconUrl>https://raw.githubusercontent.com/TsudaKageyu/taglib-nuget/master/img/taglibcpp_icon.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>TagLib is a library for reading and editing the meta-data of several popular audio formats. Currently it supports both ID3v1 and ID3v2 for MP3 files, Ogg Vorbis comments and ID3 tags and Vorbis comments in FLAC, MPC, Speex, WavPack TrueAudio, WAV, AIFF, MP4 and ASF files.</description>
+        <description>TagLib is a library for reading and editing the meta-data of several popular audio formats. Currently it supports both ID3v1 and ID3v2 for MP3 files, Ogg Vorbis comments and ID3 tags and Vorbis comments in FLAC, MPC, Speex, WavPack TrueAudio, WAV, AIFF, MP4 and ASF files.
+
+TagLib is distributed under the GNU Lesser General Public License (http://www.gnu.org/licenses/lgpl.html) and Mozilla Public License (http://www.mozilla.org/MPL/MPL-1.1.html).</description>
         <releaseNotes>This release is based on TagLib 1.9.1 and zlib 1.2.8.</releaseNotes>
         <copyright>Copyright © 2002-2014 Scott Wheeler, et al. All right reserved.</copyright>
         <language>en-US</language>
@@ -82,11 +83,13 @@
         <file src="package\lib\native\include\mpeg\id3v1\id3v1tag.h" target="lib\native\include\mpeg\id3v1\id3v1tag.h" />
         <file src="package\lib\native\include\mpeg\id3v2\frames\attachedpictureframe.h" target="lib\native\include\mpeg\id3v2\frames\attachedpictureframe.h" />
         <file src="package\lib\native\include\mpeg\id3v2\frames\commentsframe.h" target="lib\native\include\mpeg\id3v2\frames\commentsframe.h" />
+        <file src="package\lib\native\include\mpeg\id3v2\frames\eventtimingcodesframe.h" target="lib\native\include\mpeg\id3v2\frames\eventtimingcodesframe.h" />
         <file src="package\lib\native\include\mpeg\id3v2\frames\generalencapsulatedobjectframe.h" target="lib\native\include\mpeg\id3v2\frames\generalencapsulatedobjectframe.h" />
         <file src="package\lib\native\include\mpeg\id3v2\frames\ownershipframe.h" target="lib\native\include\mpeg\id3v2\frames\ownershipframe.h" />
         <file src="package\lib\native\include\mpeg\id3v2\frames\popularimeterframe.h" target="lib\native\include\mpeg\id3v2\frames\popularimeterframe.h" />
         <file src="package\lib\native\include\mpeg\id3v2\frames\privateframe.h" target="lib\native\include\mpeg\id3v2\frames\privateframe.h" />
         <file src="package\lib\native\include\mpeg\id3v2\frames\relativevolumeframe.h" target="lib\native\include\mpeg\id3v2\frames\relativevolumeframe.h" />
+        <file src="package\lib\native\include\mpeg\id3v2\frames\synchronizedlyricsframe.h" target="lib\native\include\mpeg\id3v2\frames\synchronizedlyricsframe.h" />
         <file src="package\lib\native\include\mpeg\id3v2\frames\textidentificationframe.h" target="lib\native\include\mpeg\id3v2\frames\textidentificationframe.h" />
         <file src="package\lib\native\include\mpeg\id3v2\frames\uniquefileidentifierframe.h" target="lib\native\include\mpeg\id3v2\frames\uniquefileidentifierframe.h" />
         <file src="package\lib\native\include\mpeg\id3v2\frames\unknownframe.h" target="lib\native\include\mpeg\id3v2\frames\unknownframe.h" />
