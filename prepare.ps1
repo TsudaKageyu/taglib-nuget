@@ -220,8 +220,11 @@ foreach ($dir in $dirs)
 $targetsContent += @"
 %(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>`$(MSBuildThisFileDirectory)..\..\lib\native\lib\taglib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    <Link Condition="`$(Configuration.ToLower().IndexOf('debug')) == -1">
+      <AdditionalDependencies>`$(MSBuildThisFileDirectory)..\..\lib\native\bin\taglib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link Condition="`$(Configuration.ToLower().IndexOf('debug')) &gt; -1">
+      <AdditionalDependencies>`$(MSBuildThisFileDirectory)..\..\lib\native\bin\taglibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
@@ -272,10 +275,10 @@ $targetsContent += @"
       <Output TaskParameter="Value" PropertyName="TagLib_Platform" />
     </CreateProperty>
 
-    <!-- Suffix of lib & dll file like 'x86-v100-mdd' -->
+    <!-- TagLib_Condition is like 'x86-v100-mdd' -->
 
     <CreateProperty Value="`$(TagLib_Platform)-`$(TagLib_ToolSet)-`$(TagLib_RuntimeLink)">
-      <Output TaskParameter="Value" PropertyName="TagLib_LibSuffix" />
+      <Output TaskParameter="Value" PropertyName="TagLib_Condition" />
     </CreateProperty>
 
 
@@ -292,6 +295,18 @@ $i = 1
     {
         foreach ($runtime in $RuntimeLinks)
         {
+            $arch = ""
+            if ($platform -eq "Win32") {
+                $arch = "x86"
+            }
+            else {
+                $arch = "x64"
+            }
+            $dirName = "$arch-$toolset-$runtime".ToLower()
+
+            $binOutDir = Join-Path $libBaseDir (Join-Path "bin" $dirName)
+            New-Item -Path $binOutDir -ItemType directory | Out-Null
+
             foreach ($config in $Configs)
             {
                 showMsg "Start Buiding [$toolset, $platform, $runtime, $config] ($i/$count)"
@@ -324,15 +339,7 @@ $i = 1
                 if ($config -eq "Debug") {
                     $suffix = "d"
                 }
-
-                $arch = ""
-                if ($platform -eq "Win32") {
-                    $arch = "x86"
-                }
-                else {
-                    $arch = "x64"
-                }
-                $libSuffix = "$arch-$toolset-$runtime$suffix".ToLower()
+                $libSuffix = "$dirName$suffix".ToLower()
 
                 $toolsetSuffix = "";
                 if ([int]$vsVer -ge 11) {
@@ -379,23 +386,17 @@ $i = 1
                 $params  = """$taglibProject"" "
                 $params += "/p:VisualStudioVersion=$vsVer "
                 $params += "/p:Configuration=$config "
-                $params += "/p:TargetName=taglib "
+                $params += "/p:TargetName=taglib$suffix "
                 $params += "/m "
                 execute $msbuildExe $params $workDir
 
                 # Copy necessary files
 
-                $binOutDir = Join-Path $libBaseDir (Join-Path "bin" $libSuffix)
-                New-Item -Path $binOutDir -ItemType directory | Out-Null
-
-                $libOutDir = Join-Path $libBaseDir (Join-Path "lib" $libSuffix)
-                New-Item -Path $libOutDir -ItemType directory | Out-Null
-
-                $dllPath = Join-Path $workDir "taglib\$config\taglib.dll"
+                $dllPath = Join-Path $workDir "taglib\$config\taglib$suffix.dll"
                 Copy-Item $dllPath $binOutDir
 
-                $libPath = Join-Path $workDir "taglib\$config\taglib.lib"
-                Copy-Item $libPath $libOutDir
+                $libPath = Join-Path $workDir "taglib\$config\taglib$suffix.lib"
+                Copy-Item $libPath $binOutDir
 
                 if ($i -eq 1) {
                     $src = Join-Path $workDir "taglib_config.h"
@@ -404,14 +405,12 @@ $i = 1
 
                 # Add a reference to the binary files to the targets file.
 
-                $label = "$platform-$toolset-$config"
-
-                $condition = "`$(TagLib_LibSuffix) == '$libSuffix'"
-                $libPath = "..\..\lib\native\lib\$libSuffix\taglib.lib"
-                $dllPath = "..\..\lib\native\bin\$libSuffix\taglib.dll"
+                $condition = "`$(TagLib_Condition) == '$libSuffix'"
+                $libPath = "..\..\lib\native\bin\$dirName\taglib$suffix.lib"
+                $dllPath = "..\..\lib\native\bin\$dirName\taglib$suffix.dll"
 
                 $targetsContent += @"
-    <Copy Condition="$condition" SourceFiles="`$(MSBuildThisFileDirectory)$libPath" DestinationFolder="`$(MSBuildThisFileDirectory)..\..\lib\native\lib\" />
+    <Copy Condition="$condition" SourceFiles="`$(MSBuildThisFileDirectory)$libPath" DestinationFolder="`$(MSBuildThisFileDirectory)..\..\lib\native\bin\" />
     <Copy Condition="$condition" SourceFiles="`$(MSBuildThisFileDirectory)$dllPath" DestinationFolder="`$(TargetDir)" />
 
 "@
