@@ -95,13 +95,13 @@ if ($tempDir -eq "" -or $msbuildExe -eq "") {
 
 # Locate the necessary files.
 
-$sourceDir = Join-Path $tempDir "source"
+$sourceDir = Join-Path $tempDir "taglib\source"
 $taglibUrl = "https://github.com/TsudaKageyu/taglib/archive/1.9.1-beta5.zip"
 $taglibDir = Join-Path $sourceDir "taglib-1.9.1-beta5"
 $zlibUrl = "http://zlib.net/zlib128.zip"
 $zlibDir = Join-Path $sourceDir "zlib-1.2.8"
 
-$workBaseDir  = Join-Path $tempDir "work"
+$workBaseDir  = Join-Path $tempDir "taglib\work"
 $libBaseDir   = Join-Path $thisDir "package\lib\native"
 $buildBaseDir = Join-Path $thisDir "package\build\native"
 
@@ -327,62 +327,23 @@ $i = 1
 
                 $WorkDir = Join-Path $workBaseDir "$platform\$toolset\$runtime\$config"
 
-                # Build zlib as a static library.
-                <#
-                $zlibWorkDir = Join-Path $workDir "zlib"
-                New-Item -Path $zlibWorkDir -ItemType directory | Out-Null
-
-                $params  = "-G ""$generator"" "
-                $params += "-T ""$toolset$toolsetSuffix"" "
-                $params += """$zlibDir"" "
-                execute "cmake.exe" $params $zlibWorkDir
-
-                $zlibProject = Join-Path $zlibWorkDir "zlibstatic.vcxproj"
-                Copy-Item (Join-Path $zlibDir "*.h") $zlibWorkDir
-
-                # I couldn't override some propreties of the projects with
-                # MSBuild for some reason. So modify the project file directly.
-
-                $content = (Get-Content -Path $zlibProject -Encoding UTF8)
-                $content = $content -Replace `
-                    "<RuntimeLibrary>.*</RuntimeLibrary>", `
-                    "<RuntimeLibrary>$runtimeLib</RuntimeLibrary>"
-                $content | Set-Content -Path $zlibProject -Encoding UTF8
-
-                $params  = """$zlibProject"" "
-                $params += "/p:VisualStudioVersion=$vsVer "
-                $params += "/p:Configuration=$config "
-                $params += "/p:TargetName=zlib "
-                $params += "/m "
-                execute $msbuildExe $params $zlibWorkDir
-
-                $zlibLib = Join-Path $zlibWorkDir "$config\zlib.lib"
-                #>
                 # Build TagLib as a DLL.
 
-                $taglibWorkDir = Join-Path $workDir "taglib"
-                New-Item -Path $taglibWorkDir -ItemType directory | Out-Null
-
+                New-Item -Path $workDir -ItemType directory | Out-Null
 
                 $params  = "-G ""$generator"" "
                 $params += "-T ""$toolset$toolsetSuffix"" "
-                #$params += "-DZLIB_INCLUDE_DIR=""$zlibWorkDir"" "
-                #$params += "-DZLIB_LIBRARY=""$zlibLib"" "
+                $params += "-DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /DUNICODE /D_UNICODE /wd4251 /GR /EHsc"" "
+                $params += "-DCMAKE_CXX_FLAGS_DEBUG=""/D_DEBUG /MDd /Zi /Ob0 /Od /RTC1 /$runtime" + "d"" "
+                $params += "-DCMAKE_CXX_FLAGS_RELEASE=""/$runtime /O2 /Ob2 /D NDEBUG" + "d"" "
                 $params += "-DZLIB_SOURCE=""$zlibDirC"" "
                 $params += """$taglibDir"" "
-                execute "cmake.exe" $params $taglibWorkDir
+                execute "cmake.exe" $params $workDir
 
-                $taglibProject = Join-Path $taglibWorkDir "taglib\tag.vcxproj"
+                $taglibProject = Join-Path $workDir "taglib\tag.vcxproj"
 
                 $content = (Get-Content -Path $taglibProject -Encoding UTF8)
-                $content = $content -Replace `
-                    "<RuntimeLibrary>.*</RuntimeLibrary>", `
-                    "<RuntimeLibrary>$runtimeLib</RuntimeLibrary>"
-                $content = $content -Replace "Level3",    "TurnOffAllWarnings"
-                $content = $content -Replace "MultiByte", "Unicode"
-                $content = $content -Replace "tag.lib",   "taglib.lib"
-                $content = $content -Replace "tag.pdb",   "taglib.pdb"
-
+                $content = $content -Replace "<ImportLibrary>.*</ImportLibrary>", ""
                 $lineNo = $content.Length - 1
                 if ($content[$lineNo] -eq "</Project>") {
                     $content[$lineNo] `
@@ -393,10 +354,9 @@ $i = 1
                 else {
                     showMsg "Error modifying project file."
                 }
-
                 $content | Set-Content -Path $taglibProject -Encoding UTF8
 
-                $taglibSrcDir = Join-Path $taglibWorkDir "taglib"
+                $taglibSrcDir = Join-Path $workDir "taglib"
                 Copy-Item (Join-Path $thisDir "src\dllmain.cpp")   $taglibSrcDir
                 Copy-Item (Join-Path $thisDir "src\dllversion.rc") $taglibSrcDir
 
@@ -405,7 +365,7 @@ $i = 1
                 $params += "/p:Configuration=$config "
                 $params += "/p:TargetName=taglib "
                 $params += "/m "
-                execute $msbuildExe $params $taglibWorkDir
+                execute $msbuildExe $params $workDir
 
                 # Copy necessary files
 
@@ -415,14 +375,14 @@ $i = 1
                 $libOutDir = Join-Path $libBaseDir (Join-Path "lib" $libSuffix)
                 New-Item -Path $libOutDir -ItemType directory | Out-Null
 
-                $src = Join-Path $taglibWorkDir "taglib\$config\taglib.dll"
-                Copy-Item $src $binOutDir
+                $dllPath = Join-Path $workDir "taglib\$config\taglib.dll"
+                Copy-Item $dllPath $binOutDir
 
-                $src = Join-Path $taglibWorkDir "taglib\$config\taglib.lib"
-                Copy-Item $src $libOutDir
+                $libPath = Join-Path $workDir "taglib\$config\taglib.lib"
+                Copy-Item $libPath $libOutDir
 
                 if ($i -eq 1) {
-                    $src = Join-Path $taglibWorkDir "taglib_config.h"
+                    $src = Join-Path $workDir "taglib_config.h"
                     Copy-Item $src $headerDstDir
                 }
 
