@@ -263,9 +263,18 @@ $targetsContent += @"
       <Output TaskParameter="Value" PropertyName="TagLib_ToolSet" />
     </CreateProperty>
 
-    <!-- Suffix of lib & dll file like 'win32-v100-mdd' -->
+    <!-- TagLib_Platform is CPU architecture. "x86" or "x64". -->
 
-    <CreateProperty Value="`$(Platform.ToLower())-`$(TagLib_ToolSet)-`$(TagLib_RuntimeLink)">
+    <CreateProperty Condition="`$(Platform.ToLower()) == 'win32'" Value="x86">
+      <Output TaskParameter="Value" PropertyName="TagLib_Platform" />
+    </CreateProperty>
+    <CreateProperty Condition="`$(Platform.ToLower()) == 'x64'" Value="x64">
+      <Output TaskParameter="Value" PropertyName="TagLib_Platform" />
+    </CreateProperty>
+
+    <!-- Suffix of lib & dll file like 'x86-v100-mdd' -->
+
+    <CreateProperty Value="`$(TagLib_Platform)-`$(TagLib_ToolSet)-`$(TagLib_RuntimeLink)">
       <Output TaskParameter="Value" PropertyName="TagLib_LibSuffix" />
     </CreateProperty>
 
@@ -316,7 +325,14 @@ $i = 1
                     $suffix = "d"
                 }
 
-                $libSuffix = "$platform-$toolset-$runtime$suffix".ToLower()
+                $arch = ""
+                if ($platform -eq "Win32") {
+                    $arch = "x86"
+                }
+                else {
+                    $arch = "x64"
+                }
+                $libSuffix = "$arch-$toolset-$runtime$suffix".ToLower()
 
                 $toolsetSuffix = "";
                 if ([int]$vsVer -ge 11) {
