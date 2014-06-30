@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>taglibcpp</id>
-        <version>1.9.1-beta6</version>
+        <version>1.9.1-beta7</version>
         <title>TagLib</title>
         <authors>Tsuda Kageyu,TagLib Team</authors>
         <owners>Scott Wheeler,Lukáš Lalinský,et al</owners>
@@ -15,7 +15,7 @@ TagLib is distributed under the GNU Lesser General Public License (http://www.gn
         <releaseNotes>This release is based on TagLib's GitHub snapshot on June 20, 2014 + some patches.</releaseNotes>
         <copyright>Copyright © 2002-2014 Scott Wheeler, et al. All right reserved.</copyright>
         <language>en-US</language>
-        <tags>taglib id3lib id3 aac mp3 tag c++ native windows</tags>
+        <tags>c++ native audio tag id3</tags>
     </metadata>
     <files>
         <file src="package\build\native\taglibcpp.targets" target="build\native\taglibcpp.targets" />
