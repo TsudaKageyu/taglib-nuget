@@ -356,7 +356,7 @@ $i = 1
 
                 $params  = "-G ""$generator"" "
                 $params += "-T ""$toolset$toolsetSuffix"" "
-                $params += "-DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /DUNICODE /D_UNICODE /wd4251 /GR /EHsc"" "
+                $params += "-DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /DUNICODE /D_UNICODE /W0 /GR /EHsc /arch:IA32"" "
                 $params += "-DCMAKE_CXX_FLAGS_DEBUG=""/D_DEBUG /MDd /Zi /Ob0 /Od /RTC1 /$runtime" + "d"" "
                 $params += "-DCMAKE_CXX_FLAGS_RELEASE=""/$runtime /O2 /Ob2 /D NDEBUG" + "d"" "
                 $params += "-DZLIB_SOURCE=""$zlibDirC"" "
