@@ -346,7 +346,6 @@ $i = 1
             $label = "$toolset-$platform-$config".ToLower()
             $libPath = "..\..\lib\native\lib\$dirName\taglib$suffix.lib"
             $dllPath = "..\..\lib\native\bin\$dirName\taglib$suffix.dll"
-            $pdbPath = "..\..\lib\native\bin\$dirName\taglib$suffix.pdb"
 
             $targetsContent += @"
   <ItemDefinitionGroup Label="$label" Condition="$condition">
@@ -356,16 +355,6 @@ $i = 1
   </ItemDefinitionGroup>
   <Target Name="TagLib_AfterBuild_$label" Label="$label" Condition="$Condition" AfterTargets="TagLib_AfterBuild">
     <Copy SourceFiles="`$(MSBuildThisFileDirectory)$dllPath" DestinationFolder="`$(TargetDir)" SkipUnchangedFiles="true" />
-
-"@
-            if ($config -eq "Debug") {
-                $targetsContent += @"
-    <Copy SourceFiles="`$(MSBuildThisFileDirectory)$pdbPath" DestinationFolder="`$(TargetDir)" SkipUnchangedFiles="true" />
-
-"@
-            }
-
-            $targetsContent += @"
   </Target>
 
 "@

@@ -21,28 +21,20 @@ TagLib is distributed under the GNU Lesser General Public License (http://www.gn
         <file src="package\build\native\taglibcpp.targets" target="build\native\taglibcpp.targets" />
         <file src="package\lib\native\bin\win32-v100\taglib.dll" target="lib\native\bin\win32-v100\taglib.dll" />
         <file src="package\lib\native\bin\win32-v100\taglibd.dll" target="lib\native\bin\win32-v100\taglibd.dll" />
-        <file src="package\lib\native\bin\win32-v100\taglibd.pdb" target="lib\native\bin\win32-v100\taglibd.pdb" />
         <file src="package\lib\native\bin\win32-v110\taglib.dll" target="lib\native\bin\win32-v110\taglib.dll" />
         <file src="package\lib\native\bin\win32-v110\taglibd.dll" target="lib\native\bin\win32-v110\taglibd.dll" />
-        <file src="package\lib\native\bin\win32-v110\taglibd.pdb" target="lib\native\bin\win32-v110\taglibd.pdb" />
         <file src="package\lib\native\bin\win32-v120\taglib.dll" target="lib\native\bin\win32-v120\taglib.dll" />
         <file src="package\lib\native\bin\win32-v120\taglibd.dll" target="lib\native\bin\win32-v120\taglibd.dll" />
-        <file src="package\lib\native\bin\win32-v120\taglibd.pdb" target="lib\native\bin\win32-v120\taglibd.pdb" />
         <file src="package\lib\native\bin\win32-v90\taglib.dll" target="lib\native\bin\win32-v90\taglib.dll" />
         <file src="package\lib\native\bin\win32-v90\taglibd.dll" target="lib\native\bin\win32-v90\taglibd.dll" />
-        <file src="package\lib\native\bin\win32-v90\taglibd.pdb" target="lib\native\bin\win32-v90\taglibd.pdb" />
         <file src="package\lib\native\bin\x64-v100\taglib.dll" target="lib\native\bin\x64-v100\taglib.dll" />
         <file src="package\lib\native\bin\x64-v100\taglibd.dll" target="lib\native\bin\x64-v100\taglibd.dll" />
-        <file src="package\lib\native\bin\x64-v100\taglibd.pdb" target="lib\native\bin\x64-v100\taglibd.pdb" />
         <file src="package\lib\native\bin\x64-v110\taglib.dll" target="lib\native\bin\x64-v110\taglib.dll" />
         <file src="package\lib\native\bin\x64-v110\taglibd.dll" target="lib\native\bin\x64-v110\taglibd.dll" />
-        <file src="package\lib\native\bin\x64-v110\taglibd.pdb" target="lib\native\bin\x64-v110\taglibd.pdb" />
         <file src="package\lib\native\bin\x64-v120\taglib.dll" target="lib\native\bin\x64-v120\taglib.dll" />
         <file src="package\lib\native\bin\x64-v120\taglibd.dll" target="lib\native\bin\x64-v120\taglibd.dll" />
-        <file src="package\lib\native\bin\x64-v120\taglibd.pdb" target="lib\native\bin\x64-v120\taglibd.pdb" />
         <file src="package\lib\native\bin\x64-v90\taglib.dll" target="lib\native\bin\x64-v90\taglib.dll" />
         <file src="package\lib\native\bin\x64-v90\taglibd.dll" target="lib\native\bin\x64-v90\taglibd.dll" />
-        <file src="package\lib\native\bin\x64-v90\taglibd.pdb" target="lib\native\bin\x64-v90\taglibd.pdb" />
         <file src="package\lib\native\include\ape\apefile.h" target="lib\native\include\ape\apefile.h" />
         <file src="package\lib\native\include\ape\apefooter.h" target="lib\native\include\ape\apefooter.h" />
         <file src="package\lib\native\include\ape\apeitem.h" target="lib\native\include\ape\apeitem.h" />
