@@ -92,8 +92,8 @@ if ($tempDir -eq "" -or $msbuildExe -eq "") {
 # Locate the necessary files.
 
 $sourceDir = Join-Path $tempDir "taglib\source"
-$taglibUrl = "https://github.com/TsudaKageyu/taglib/archive/1.9.1-beta6.zip"
-$taglibDir = Join-Path $sourceDir "taglib-1.9.1-beta6"
+$taglibUrl = "https://github.com/TsudaKageyu/taglib/archive/1.9.1-beta8.zip"
+$taglibDir = Join-Path $sourceDir "taglib-1.9.1-beta8"
 $zlibUrl = "http://zlib.net/zlib128.zip"
 $zlibDir = Join-Path $sourceDir "zlib-1.2.8"
 
@@ -153,15 +153,15 @@ $headerDstDir = Join-Path $libBaseDir "include"
 $fileName = Join-Path $taglibDir "taglib\CMakeLists.txt"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-if ($lines.Length -ne 353 `
+if ($lines.Length -ne 357 `
     -or $lines[34]  -ne "set(tag_HDRS" `
-    -or $lines[136] -ne ")")
+    -or $lines[138] -ne ")")
 {
     showMsg "Error reading taglib/CMakeLists.txt (header files)!"
     exit
 }
 
-foreach ($header in $lines[35..135])
+foreach ($header in $lines[35..137])
 {
     if ($header -eq '${CMAKE_BINARY_DIR}/taglib_config.h') {
         # Skip it. taglib_config.h is no longer used.
@@ -278,9 +278,9 @@ $i = 1
 
             $params  = "-G ""$generator"" "
             $params += "-T ""$toolset$toolsetSuffix"" "
-            $params += "-DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /DUNICODE /D_UNICODE /W0 /GR /EHsc /arch:IA32"" "
+            $params += "-DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /DUNICODE /D_UNICODE /W0 /GR /EHsc /arch:IA32 /MP "" "
             $params += "-DCMAKE_CXX_FLAGS_DEBUG=""/D_DEBUG /MDd /Zi /Ob0 /Od /RTC1"" "
-            $params += "-DCMAKE_CXX_FLAGS_RELEASE=""/MD /O2 /Ob2 /D NDEBUG"" "
+            $params += "-DCMAKE_CXX_FLAGS_RELEASE=""/MD /GL /O2 /Ob2 /D NDEBUG"" "
             $params += "-DZLIB_SOURCE=""$zlibDirC"" "
             $params += """$taglibDir"" "
             execute "cmake.exe" $params $workDir
@@ -310,7 +310,6 @@ $i = 1
             $params += "/p:VisualStudioVersion=$vsVer "
             $params += "/p:Configuration=$config "
             $params += "/p:TargetName=taglib$suffix "
-            $params += "/m "
             execute $msbuildExe $params $workDir
 
             # Copy necessary files
