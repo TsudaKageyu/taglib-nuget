@@ -94,8 +94,8 @@ if ($tempDir -eq "" -or $msbuildExe -eq "") {
 # Locate the necessary files.
 
 $sourceDir = Join-Path $tempDir "taglib\source"
-$taglibUrl = "https://github.com/TsudaKageyu/taglib/archive/1.9.1-beta9.zip"
-$taglibDir = Join-Path $sourceDir "taglib-1.9.1-beta9"
+$taglibUrl = "https://github.com/TsudaKageyu/taglib/archive/1.9.1-beta10.zip"
+$taglibDir = Join-Path $sourceDir "taglib-1.9.1-beta10"
 $zlibUrl = "http://zlib.net/zlib128.zip"
 $zlibDir = Join-Path $sourceDir "zlib-1.2.8"
 
