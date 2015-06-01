@@ -56,6 +56,8 @@ function extract($path)
     execute $e "x ""$f""" $d
 }
 
+# Execute a command.
+
 function execute($exe, $params, $dir)
 {
     # It looks like WaitForExit() is more stable than -Wait.
