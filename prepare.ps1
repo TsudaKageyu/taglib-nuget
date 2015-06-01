@@ -92,8 +92,8 @@ if ($tempDir -eq "" -or $msbuildExe -eq "") {
 # Locate the necessary files.
 
 $sourceDir = Join-Path $tempDir "taglib\source"
-$taglibUrl = "https://github.com/TsudaKageyu/taglib/archive/1.9.1-beta8.zip"
-$taglibDir = Join-Path $sourceDir "taglib-1.9.1-beta8"
+$taglibUrl = "https://github.com/TsudaKageyu/taglib/archive/1.9.1-beta10.zip"
+$taglibDir = Join-Path $sourceDir "taglib-1.9.1-beta10"
 $zlibUrl = "http://zlib.net/zlib128.zip"
 $zlibDir = Join-Path $sourceDir "zlib-1.2.8"
 
@@ -136,10 +136,10 @@ if (Test-Path $buildBaseDir) {
 $fileName = Join-Path $taglibDir "CMakeLists.txt"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-if ($lines.Length -ne 129 `
-    -or $lines[52] -ne 'set(TAGLIB_LIB_MAJOR_VERSION "1")' `
-    -or $lines[53] -ne 'set(TAGLIB_LIB_MINOR_VERSION "9")' `
-    -or $lines[54] -ne 'set(TAGLIB_LIB_PATCH_VERSION "1")')
+if ($lines.Length -ne 131 `
+    -or $lines[54] -ne 'set(TAGLIB_LIB_MAJOR_VERSION "1")' `
+    -or $lines[55] -ne 'set(TAGLIB_LIB_MINOR_VERSION "9")' `
+    -or $lines[56] -ne 'set(TAGLIB_LIB_PATCH_VERSION "1")')
 {
     showMsg "TagLib version mismatch!"
     exit
@@ -153,7 +153,7 @@ $headerDstDir = Join-Path $libBaseDir "include"
 $fileName = Join-Path $taglibDir "taglib\CMakeLists.txt"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-if ($lines.Length -ne 357 `
+if ($lines.Length -ne 361 `
     -or $lines[34]  -ne "set(tag_HDRS" `
     -or $lines[138] -ne ")")
 {
@@ -163,7 +163,7 @@ if ($lines.Length -ne 357 `
 
 foreach ($header in $lines[35..137])
 {
-    if ($header -eq '${CMAKE_BINARY_DIR}/taglib_config.h') {
+    if ($header -eq '${CMAKE_CURRENT_BINARY_DIR}/../taglib_config.h') {
         # Skip it. taglib_config.h is no longer used.
     }
     else {
