@@ -96,8 +96,7 @@ if ($tempDir -eq "" -or $msbuildExe -eq "") {
 $sourceDir = Join-Path $tempDir "taglib\source"
 $taglibUrl = "https://github.com/TsudaKageyu/taglib/archive/1.9.1-beta10.zip"
 $taglibDir = Join-Path $sourceDir "taglib-1.9.1-beta10"
-$zlibUrl = "http://zlib.net/zlib128.zip"
-$zlibDir = Join-Path $sourceDir "zlib-1.2.8"
+$zlibDir = Join-Path $thisDir "src/zlib"
 
 $workBaseDir  = Join-Path $tempDir "taglib\work"
 $libBaseDir   = Join-Path $thisDir "package\lib\native"
@@ -112,12 +111,6 @@ if (-not (Test-Path $sourceDir)) {
 if (-not (Test-Path $taglibDir)) {
     showMsg "TagLib source not found. Downloading..."
     $f = download $taglibUrl $sourceDir
-    extract $f
-}
-
-if (-not (Test-Path $zlibDir)) {
-    showMsg "zlib source not found. Downloading..."
-    $f = download $zlibUrl $sourceDir
     extract $f
 }
 
