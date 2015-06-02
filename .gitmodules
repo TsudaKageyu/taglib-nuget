@@ -1,3 +1,6 @@
 [submodule "src/zlib"]
 	path = src/zlib
 	url = https://github.com/madler/zlib.git
+[submodule "src/taglib"]
+	path = src/taglib
+	url = https://github.com/taglib/taglib.git
