@@ -190,7 +190,7 @@ $i = 1
 
         foreach ($config in $Configs)
         {
-            showMsg "Start Buiding [$toolset, $platform, $config] ($i/$count)"
+            showMsg "Start Building [$toolset, $platform, $config] ($i/$count)"
 
             # CMake and MsBuid parameters.
 
