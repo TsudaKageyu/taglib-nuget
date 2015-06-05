@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 # MSBuild Settings
 
 Set-Variable -Name Toolsets -Option Constant -Value @(
-    "v90", "v100", "v110", "v120"
+    "v90", "v100", "v110", "v120", "v140"
 )
 
 Set-Variable -Name Platforms -Option Constant -Value @(

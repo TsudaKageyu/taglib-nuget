@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>taglibcpp</id>
-        <version>1.9.1-beta10</version>
+        <version>1.9.2-beta</version>
         <title>TagLib</title>
         <authors>Tsuda Kageyu,TagLib Team</authors>
         <owners>Scott Wheeler,Lukáš Lalinský,et al</owners>
@@ -25,6 +25,8 @@ TagLib is distributed under the GNU Lesser General Public License (http://www.gn
         <file src="package\lib\native\bin\win32-v110\taglibd.dll" target="lib\native\bin\win32-v110\taglibd.dll" />
         <file src="package\lib\native\bin\win32-v120\taglib.dll" target="lib\native\bin\win32-v120\taglib.dll" />
         <file src="package\lib\native\bin\win32-v120\taglibd.dll" target="lib\native\bin\win32-v120\taglibd.dll" />
+        <file src="package\lib\native\bin\win32-v140\taglib.dll" target="lib\native\bin\win32-v140\taglib.dll" />
+        <file src="package\lib\native\bin\win32-v140\taglibd.dll" target="lib\native\bin\win32-v140\taglibd.dll" />
         <file src="package\lib\native\bin\win32-v90\taglib.dll" target="lib\native\bin\win32-v90\taglib.dll" />
         <file src="package\lib\native\bin\win32-v90\taglibd.dll" target="lib\native\bin\win32-v90\taglibd.dll" />
         <file src="package\lib\native\bin\x64-v100\taglib.dll" target="lib\native\bin\x64-v100\taglib.dll" />
@@ -33,6 +35,8 @@ TagLib is distributed under the GNU Lesser General Public License (http://www.gn
         <file src="package\lib\native\bin\x64-v110\taglibd.dll" target="lib\native\bin\x64-v110\taglibd.dll" />
         <file src="package\lib\native\bin\x64-v120\taglib.dll" target="lib\native\bin\x64-v120\taglib.dll" />
         <file src="package\lib\native\bin\x64-v120\taglibd.dll" target="lib\native\bin\x64-v120\taglibd.dll" />
+        <file src="package\lib\native\bin\x64-v140\taglib.dll" target="lib\native\bin\x64-v140\taglib.dll" />
+        <file src="package\lib\native\bin\x64-v140\taglibd.dll" target="lib\native\bin\x64-v140\taglibd.dll" />
         <file src="package\lib\native\bin\x64-v90\taglib.dll" target="lib\native\bin\x64-v90\taglib.dll" />
         <file src="package\lib\native\bin\x64-v90\taglibd.dll" target="lib\native\bin\x64-v90\taglibd.dll" />
         <file src="package\lib\native\include\ape\apefile.h" target="lib\native\include\ape\apefile.h" />
@@ -142,6 +146,8 @@ TagLib is distributed under the GNU Lesser General Public License (http://www.gn
         <file src="package\lib\native\lib\win32-v110\taglibd.lib" target="lib\native\lib\win32-v110\taglibd.lib" />
         <file src="package\lib\native\lib\win32-v120\taglib.lib" target="lib\native\lib\win32-v120\taglib.lib" />
         <file src="package\lib\native\lib\win32-v120\taglibd.lib" target="lib\native\lib\win32-v120\taglibd.lib" />
+        <file src="package\lib\native\lib\win32-v140\taglib.lib" target="lib\native\lib\win32-v140\taglib.lib" />
+        <file src="package\lib\native\lib\win32-v140\taglibd.lib" target="lib\native\lib\win32-v140\taglibd.lib" />
         <file src="package\lib\native\lib\win32-v90\taglib.lib" target="lib\native\lib\win32-v90\taglib.lib" />
         <file src="package\lib\native\lib\win32-v90\taglibd.lib" target="lib\native\lib\win32-v90\taglibd.lib" />
         <file src="package\lib\native\lib\x64-v100\taglib.lib" target="lib\native\lib\x64-v100\taglib.lib" />
@@ -150,6 +156,8 @@ TagLib is distributed under the GNU Lesser General Public License (http://www.gn
         <file src="package\lib\native\lib\x64-v110\taglibd.lib" target="lib\native\lib\x64-v110\taglibd.lib" />
         <file src="package\lib\native\lib\x64-v120\taglib.lib" target="lib\native\lib\x64-v120\taglib.lib" />
         <file src="package\lib\native\lib\x64-v120\taglibd.lib" target="lib\native\lib\x64-v120\taglibd.lib" />
+        <file src="package\lib\native\lib\x64-v140\taglib.lib" target="lib\native\lib\x64-v140\taglib.lib" />
+        <file src="package\lib\native\lib\x64-v140\taglibd.lib" target="lib\native\lib\x64-v140\taglibd.lib" />
         <file src="package\lib\native\lib\x64-v90\taglib.lib" target="lib\native\lib\x64-v90\taglib.lib" />
         <file src="package\lib\native\lib\x64-v90\taglibd.lib" target="lib\native\lib\x64-v90\taglibd.lib" />
     </files>
