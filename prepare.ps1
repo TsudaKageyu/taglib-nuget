@@ -219,7 +219,7 @@ $i = 1
             }
 
             $archFlag = ""
-            if (($toolset -ne "v90") -and ($platform -eq "Win32")) {
+            if (([int]$vsVer -ge 11) -and ($platform -eq "Win32")) {
                 $archFlag = "/arch:IA32"
             }
 
