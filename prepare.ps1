@@ -50,23 +50,14 @@ function execute($exe, $params, $dir)
 
 $thisDir = Split-Path $script:myInvocation.MyCommand.path -Parent
 
-# Read the settings.
+# Locate the necessary files.
 
-$tempDir    = ""
-$msbuildExe = ""
-$lines = Get-Content (Join-Path $thisDir "prepare.ini") -Encoding UTF8
-foreach ($line in $lines) {
-    $s = $line.split("=").Trim()
-    if ($s[0] -eq "MSBuildExe") {
-        $msbuildExe = $s[1]
-    }
-}
-if ($msbuildExe -eq "") {
-    showMsg("Error reading prepare.ini!")
+$msbuildExe = Join-Path ([Environment]::GetFolderPath('ProgramFilesX86')) "MSBuild\14.0\Bin\MSBuild.exe"
+
+if (-not (Test-Path $msbuildExe)) {
+    showMsg("MsBuild.exe not found!")
     exit
 }
-
-# Locate the necessary files.
 
 $tempDir = Join-Path ([environment]::getenvironmentvariable("TEMP")) "taglib-nuget-build"
 
