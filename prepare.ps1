@@ -57,19 +57,18 @@ $msbuildExe = ""
 $lines = Get-Content (Join-Path $thisDir "prepare.ini") -Encoding UTF8
 foreach ($line in $lines) {
     $s = $line.split("=").Trim()
-    if ($s[0] -eq "TempDir") {
-        $tempDir = $s[1]
-    }
-    elseif ($s[0] -eq "MSBuildExe") {
+    if ($s[0] -eq "MSBuildExe") {
         $msbuildExe = $s[1]
     }
 }
-if ($tempDir -eq "" -or $msbuildExe -eq "") {
+if ($msbuildExe -eq "") {
     showMsg("Error reading prepare.ini!")
     exit
 }
 
 # Locate the necessary files.
+
+$tempDir = Join-Path ([environment]::getenvironmentvariable("TEMP")) "taglib-nuget-build"
 
 $sourceDir = Join-Path $tempDir "taglib\source"
 $taglibDir = Join-Path $thisDir "src\taglib"
@@ -78,12 +77,6 @@ $zlibDir   = Join-Path $thisDir "src\zlib"
 $workBaseDir  = Join-Path $tempDir "taglib\work"
 $libBaseDir   = Join-Path $thisDir "package\lib\native"
 $buildBaseDir = Join-Path $thisDir "package\build\native"
-
-# Download and extract the source files if not found.
-
-if (-not (Test-Path $sourceDir)) {
-    New-Item -Path $sourceDir -ItemType directory | Out-Null
-}
 
 if (Test-Path $workBaseDir) {
     Remove-Item -Path $workBaseDir -Recurse -Force
