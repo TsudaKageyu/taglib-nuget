@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>taglibcpp</id>
-        <version>1.9.2-beta</version>
+        <version>1.10-beta</version>
         <title>TagLib</title>
         <authors>Tsuda Kageyu,TagLib Team</authors>
         <owners>Scott Wheeler,Lukáš Lalinský,et al</owners>
