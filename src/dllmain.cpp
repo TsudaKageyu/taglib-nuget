@@ -7,7 +7,7 @@
 
 namespace TagLib_Nuget
 {
-    class DebugListner : public TagLib::DebugListener
+    class DebugListener : public TagLib::DebugListener
     {
         virtual void printMessage(const TagLib::String &msg)
         {
@@ -15,7 +15,7 @@ namespace TagLib_Nuget
         }
     };
 
-    DebugListner listener;
+    DebugListener listener;
 }
 
 #endif
