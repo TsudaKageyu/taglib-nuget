@@ -1,4 +1,4 @@
-﻿# This script prepares all the required files for the NuGet package.
+# This script prepares all the required files for the NuGet package.
 # * .targets file
 # * Header files
 # * DLL and import library files
