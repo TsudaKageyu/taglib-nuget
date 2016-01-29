@@ -83,13 +83,13 @@ if (Test-Path $buildBaseDir) {
 
 # Check TagLib version.
 
-$fileName = Join-Path $taglibDir "CMakeLists.txt"
+$fileName = Join-Path $taglibDir "taglib\toolkit\taglib.h"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-if ($lines.Length -ne 137 `
-    -or $lines[54] -ne 'set(TAGLIB_LIB_MAJOR_VERSION "1")' `
-    -or $lines[55] -ne 'set(TAGLIB_LIB_MINOR_VERSION "10")' `
-    -or $lines[56] -ne 'set(TAGLIB_LIB_PATCH_VERSION "0")')
+if ($lines.Length -ne 170 `
+    -or $lines[30] -ne '#define TAGLIB_MAJOR_VERSION 1' `
+    -or $lines[31] -ne '#define TAGLIB_MINOR_VERSION 11' `
+    -or $lines[32] -ne '#define TAGLIB_PATCH_VERSION 0')
 {
     showMsg "TagLib version mismatch!"
     exit
@@ -103,15 +103,15 @@ $headerDstDir = Join-Path $libBaseDir "include"
 $fileName = Join-Path $taglibDir "taglib\CMakeLists.txt"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-if ($lines.Length -ne 361 `
+if ($lines.Length -ne 364 `
     -or $lines[34]  -ne "set(tag_HDRS" `
-    -or $lines[138] -ne ")")
+    -or $lines[139] -ne ")")
 {
     showMsg "Error reading taglib/CMakeLists.txt (header files)!"
     exit
 }
 
-foreach ($header in $lines[35..137])
+foreach ($header in $lines[35..138])
 {
     if ($header -eq '${CMAKE_CURRENT_BINARY_DIR}/../taglib_config.h') {
         # Skip it. taglib_config.h is no longer used.
@@ -236,6 +236,7 @@ $i = 1
             $params += "-DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /DUNICODE /D_UNICODE /W0 /GR /EHsc $archFlag /MP "" "
             $params += "-DCMAKE_CXX_FLAGS_DEBUG=""/D_DEBUG /MDd /Zi /Ob0 /Od /RTC1"" "
             $params += "-DCMAKE_CXX_FLAGS_RELEASE=""/MD /GL /O2 /Ob2 /D NDEBUG"" "
+            $params += "-DBUILD_SHARED_LIBS=on "
             $params += "-DZLIB_SOURCE=""$zlibDirC"" "
             $params += """$taglibDir"" "
             execute "cmake.exe" $params $workDir
