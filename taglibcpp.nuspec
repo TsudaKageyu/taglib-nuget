@@ -3,7 +3,7 @@
     <metadata>
         <id>taglibcpp</id>
         <version>1.11-BETA</version>
-        <title>TagLib</title>
+        <title>TagLib (Native)</title>
         <authors>Tsuda Kageyu,TagLib Team</authors>
         <owners>Scott Wheeler,Lukáš Lalinský,et al</owners>
         <projectUrl>http://taglib.github.io/</projectUrl>
