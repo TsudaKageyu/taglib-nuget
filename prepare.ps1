@@ -103,15 +103,15 @@ $headerDstDir = Join-Path $libBaseDir "include"
 $fileName = Join-Path $taglibDir "taglib\CMakeLists.txt"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-if ($lines.Length -ne 364 `
-    -or $lines[34]  -ne "set(tag_HDRS" `
-    -or $lines[139] -ne ")")
+if ($lines.Length -ne 372 `
+    -or $lines[38]  -ne "set(tag_HDRS" `
+    -or $lines[143] -ne ")")
 {
     showMsg "Error reading taglib/CMakeLists.txt (header files)!"
     exit
 }
 
-foreach ($header in $lines[35..138])
+foreach ($header in $lines[39..142])
 {
     if ($header -eq '${CMAKE_CURRENT_BINARY_DIR}/../taglib_config.h') {
         # Skip it. taglib_config.h is no longer used.
@@ -226,6 +226,7 @@ $i = 1
 
             $params  = "-G ""$generator"" "
             $params += "-T ""$toolset$toolsetSuffix"" "
+            $params += "-DBoost_USE_STATIC_LIBS=on "
             $params += "-DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /DUNICODE /D_UNICODE /W0 /GR /EHsc $archFlag /MP "" "
             $params += "-DCMAKE_CXX_FLAGS_DEBUG=""/D_DEBUG /MDd /Zi /Ob0 /Od /RTC1"" "
             $params += "-DCMAKE_CXX_FLAGS_RELEASE=""/MD /GL /O2 /Ob2 /D NDEBUG"" "
