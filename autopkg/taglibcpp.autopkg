@@ -1,0 +1,111 @@
+configurations {
+    Toolset {
+        key : "PlatformToolset";
+        choices: { v100, v110, v120, v140 };
+        // Explicitly Not including pivot variants:  "WindowsKernelModeDriver8.0", "WindowsApplicationForDrivers8.0", "WindowsUserModeDriver8.0"
+
+        // We're normalizing out the concept of the v140 platform -- Overloading the $(PlatformToolset) variable for additional pivots was a dumb idea.
+        v140.condition = "( $(PlatformToolset.ToLower().IndexOf('v140')) > -1 Or '$(PlatformToolset.ToLower())' == 'windowskernelmodedriver8.0' Or '$(PlatformToolset.ToLower())' == 'windowsapplicationfordrivers8.0' Or '$(PlatformToolset.ToLower())' == 'windowsusermodedriver8.0' )";
+    };
+}
+
+nuget {
+    nuspec {
+        id = taglibcpp;
+        version: 1.11.0-BETA;
+        title: TagLib (Native);
+        authors: {Tsuda Kageyu, TagLib Team};
+        owners: {Scott Wheeler, Lukáš Lalinský, et al};
+        licenseUrl: "http://www.gnu.org/licenses/lgpl.html";
+        projectUrl: "http://taglib.github.io/";
+        iconUrl: "http://tsudakageyu.github.io/taglib-nuget/assets/icon.png";
+        requireLicenseAcceptance: false;
+        summary: @"Library for reading and editing the meta-data of several audio formats.";
+        description: @"TagLib is a library for reading and editing the meta-data of several popular audio formats. Currently it supports both ID3v1 and ID3v2 for MP3 files, Ogg Vorbis comments and ID3 tags and Vorbis comments in FLAC, MPC, Speex, WavPack TrueAudio, WAV, AIFF, MP4 and ASF files.
+
+TagLib is distributed under the GNU Lesser General Public License (http://www.gnu.org/licenses/lgpl.html) and Mozilla Public License (http://www.mozilla.org/MPL/MPL-1.1.html).";
+        releaseNotes: "This release is based on TagLib v1.11 BETA released on January 30, 2016.";
+        copyright: "Copyright © 2002-2016 Scott Wheeler, et al. All right reserved.";
+        tags: { c++ native audio tag id3 v100 v110 v120 v140 Win32 x64 };
+    }
+
+    files {
+        include: { ..\package\lib\native\include\**\*.h };
+
+        [v100,Win32,Debug] {
+            lib:     { ..\package\lib\native\lib\win32-v100\taglibd.lib };
+            bin:     { ..\package\lib\native\bin\win32-v100\taglibd.dll };
+            symbols: { ..\package\lib\native\bin\win32-v100\taglibd.pdb };
+        }
+        [v100,Win32,Release] {
+            lib:     { ..\package\lib\native\lib\win32-v100\taglib.lib };
+            bin:     { ..\package\lib\native\bin\win32-v100\taglib.dll };
+        }
+        [v100,x64,Debug] {
+            lib:     { ..\package\lib\native\lib\x64-v100\taglibd.lib };
+            bin:     { ..\package\lib\native\bin\x64-v100\taglibd.dll };
+            symbols: { ..\package\lib\native\bin\x64-v100\taglibd.pdb };
+        }
+        [v100,x64,Release] {
+            lib:     { ..\package\lib\native\lib\x64-v100\taglib.lib };
+            bin:     { ..\package\lib\native\bin\x64-v100\taglib.dll };
+        }
+
+        [v110,Win32,Debug] {
+            lib:     { ..\package\lib\native\lib\win32-v110\taglibd.lib };
+            bin:     { ..\package\lib\native\bin\win32-v110\taglibd.dll };
+            symbols: { ..\package\lib\native\bin\win32-v110\taglibd.pdb };
+        }
+        [v110,Win32,Release] {
+            lib:     { ..\package\lib\native\lib\win32-v110\taglib.lib };
+            bin:     { ..\package\lib\native\bin\win32-v110\taglib.dll };
+        }
+        [v110,x64,Debug] {
+            lib:     { ..\package\lib\native\lib\x64-v110\taglibd.lib };
+            bin:     { ..\package\lib\native\bin\x64-v110\taglibd.dll };
+            symbols: { ..\package\lib\native\bin\x64-v110\taglibd.pdb };
+        }
+        [v110,x64,Release] {
+            lib:     { ..\package\lib\native\lib\x64-v110\taglib.lib };
+            bin:     { ..\package\lib\native\bin\x64-v110\taglib.dll };
+        }
+
+        [v120,Win32,Debug] {
+            lib:     { ..\package\lib\native\lib\win32-v120\taglibd.lib };
+            bin:     { ..\package\lib\native\bin\win32-v120\taglibd.dll };
+            symbols: { ..\package\lib\native\bin\win32-v120\taglibd.pdb };
+        }
+        [v120,Win32,Release] {
+            lib:     { ..\package\lib\native\lib\win32-v120\taglib.lib };
+            bin:     { ..\package\lib\native\bin\win32-v120\taglib.dll };
+        }
+        [v120,x64,Debug] {
+            lib:     { ..\package\lib\native\lib\x64-v120\taglibd.lib };
+            bin:     { ..\package\lib\native\bin\x64-v120\taglibd.dll };
+            symbols: { ..\package\lib\native\bin\x64-v120\taglibd.pdb };
+        }
+        [v120,x64,Release] {
+            lib:     { ..\package\lib\native\lib\x64-v120\taglib.lib };
+            bin:     { ..\package\lib\native\bin\x64-v120\taglib.dll };
+        }
+
+        [v140,Win32,Debug] {
+            lib:     { ..\package\lib\native\lib\win32-v140\taglibd.lib };
+            bin:     { ..\package\lib\native\bin\win32-v140\taglibd.dll };
+            symbols: { ..\package\lib\native\bin\win32-v140\taglibd.pdb };
+        }
+        [v140,Win32,Release] {
+            lib:     { ..\package\lib\native\lib\win32-v140\taglib.lib };
+            bin:     { ..\package\lib\native\bin\win32-v140\taglib.dll };
+        }
+        [v140,x64,Debug] {
+            lib:     { ..\package\lib\native\lib\x64-v140\taglibd.lib };
+            bin:     { ..\package\lib\native\bin\x64-v140\taglibd.dll };
+            symbols: { ..\package\lib\native\bin\x64-v140\taglibd.pdb };
+        }
+        [v140,x64,Release] {
+            lib:     { ..\package\lib\native\lib\x64-v140\taglib.lib };
+            bin:     { ..\package\lib\native\bin\x64-v140\taglib.dll };
+        }
+    }
+}
