@@ -127,23 +127,6 @@ foreach ($header in $lines[39..142])
     }
 }
 
-# Begin creating the targets file.
-
-$targetsContent = @"
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-"@
-
-# Add include paths to the targets file.
-
-$targetsContent += @"
-  <ItemDefinitionGroup>
-    <ClCompile>
-      <PreprocessorDefinitions>TAGLIB_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>
-"@
-
 $fileName = Join-Path $taglibDir "taglib\CMakeLists.txt"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
@@ -159,17 +142,11 @@ $dirs = @("")
 $dirs += $lines[2..25].Replace('${CMAKE_CURRENT_SOURCE_DIR}', "")
 foreach ($dir in $dirs)
 {
-    $tmp = Join-Path "`$(MSBuildThisFileDirectory)..\..\lib\native\include" $dir
-    $targetsContent += "$tmp;"
+    $tmp = Join-Path "..\..\lib\native\include" $dir
+    $tmp = Join-Path $tmp "*.h"
+    echo $tmp
 }
-
-$targetsContent += @"
-%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <Target Name="TagLib_AfterBuild" AfterTargets="AfterBuild" />
-
-"@
+exit
 
 # Go through all the platforms, toolsets and configurations.
 
@@ -297,30 +274,7 @@ $i = 1
             $libPath = "..\..\lib\native\lib\$dirName\taglib$suffix.lib"
             $dllPath = "..\..\lib\native\bin\$dirName\taglib$suffix.dll"
 
-            $targetsContent += @"
-  <ItemDefinitionGroup Label="$label" Condition="$condition">
-    <Link>
-      <AdditionalDependencies>`$(MSBuildThisFileDirectory)$libPath;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <Target Name="TagLib_AfterBuild_$label" Label="$label" Condition="$Condition" AfterTargets="TagLib_AfterBuild">
-    <Copy SourceFiles="`$(MSBuildThisFileDirectory)$dllPath" DestinationFolder="`$(TargetDir)" SkipUnchangedFiles="true" />
-  </Target>
-
-"@
             $i++;
         }
     }
 }
-
-# Finish creating the targets file.
-
-$targetsContent += @"
-</Project>
-
-"@
-
-New-Item -Path $buildBaseDir -ItemType directory | Out-Null
-[System.IO.File]::WriteAllText( `
-    (Join-Path $buildBaseDir "taglibcpp.targets"), $targetsContent)
-
