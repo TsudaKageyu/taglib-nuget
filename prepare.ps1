@@ -103,7 +103,7 @@ $headerDstDir = Join-Path $libBaseDir "include"
 $fileName = Join-Path $taglibDir "taglib\CMakeLists.txt"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-if ($lines.Length -ne 372 `
+if ($lines.Length -ne 377 `
     -or $lines[38]  -ne "set(tag_HDRS" `
     -or $lines[143] -ne ")")
 {
@@ -190,6 +190,19 @@ $i = 1
 
         foreach ($config in $Configs)
         {
+            $env:BOOST_ROOT="C:\boost_1_60_0"
+            $env:BOOST_INCLUDEDIR="C:\boost_1_60_0\boost"
+
+            $libdir = ""
+            if ($platform -eq "x64") {
+              $libdir = "x64"
+            }
+            else {
+              $libdir = "x86"
+            }
+
+            $env:BOOST_LIBRARYDIR="C:\boost_1_60_0\$libdir\lib"
+
             showMsg "Start Building [$toolset, $platform, $config] ($i/$count)"
 
             # CMake and MsBuid parameters.
@@ -231,10 +244,8 @@ $i = 1
             $params += "-DCMAKE_CXX_FLAGS_DEBUG=""/D_DEBUG /MDd /Zi /Ob0 /Od /RTC1"" "
             $params += "-DCMAKE_CXX_FLAGS_RELEASE=""/MD /GL /O2 /Ob2 /D NDEBUG"" "
             $params += "-DBUILD_SHARED_LIBS=on "
-            $params += "-DZLIB_SOURCE=""$zlibDirC"" "
             $params += """$taglibDir"" "
             execute "cmake.exe" $params $workDir
-
             $taglibProject = Join-Path $workDir "taglib\tag.vcxproj"
 
             $content = (Get-Content -Path $taglibProject -Encoding UTF8)
