@@ -190,8 +190,8 @@ $i = 1
 
         foreach ($config in $Configs)
         {
-            $env:BOOST_ROOT="C:\boost_1_60_0"
-            $env:BOOST_INCLUDEDIR="C:\boost_1_60_0\boost"
+            $env:BOOST_ROOT="C:\boost_1_61_0"
+            $env:BOOST_INCLUDEDIR="C:\boost_1_61_0\boost"
 
             $libdir = ""
             if ($platform -eq "x64") {
@@ -201,7 +201,7 @@ $i = 1
               $libdir = "x86"
             }
 
-            $env:BOOST_LIBRARYDIR="C:\boost_1_60_0\$libdir\lib"
+            $env:BOOST_LIBRARYDIR="C:\boost_1_61_0\$libdir\lib"
 
             showMsg "Start Building [$toolset, $platform, $config] ($i/$count)"
 
