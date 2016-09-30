@@ -200,7 +200,7 @@ $i = 1
             $env:BOOST_INCLUDEDIR="$BoostRoot\boost"
 
             if ($platform -eq "x64") {
-              $bitness + "64"
+              $bitness = "64"
             }
             else {
               $bitness = "32"
