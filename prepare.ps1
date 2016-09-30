@@ -22,6 +22,8 @@ Set-Variable -Name Configs -Option Constant -Value @(
     "Debug", "Release"
 )
 
+Set-Variable -Name BoostRoot -Option Constant -Value "C:\boost_1_62_0"
+
 ################################################################################
 # Functions
 
@@ -190,25 +192,25 @@ $i = 1
 
         foreach ($config in $Configs)
         {
-            $env:BOOST_ROOT="C:\boost_1_61_0"
-            $env:BOOST_INCLUDEDIR="C:\boost_1_61_0\boost"
+            showMsg "Start Building [$toolset, $platform, $config] ($i/$count)"
 
-            $libdir = ""
+            $vsVer = $toolset.Substring(1, 2) + ".0"
+
+            $env:BOOST_ROOT="$BoostRoot"
+            $env:BOOST_INCLUDEDIR="$BoostRoot\boost"
+
             if ($platform -eq "x64") {
-              $libdir = "x64"
+              $bitness + "64"
             }
             else {
-              $libdir = "x86"
+              $bitness = "32"
             }
 
-            $env:BOOST_LIBRARYDIR="C:\boost_1_61_0\$libdir\lib"
-
-            showMsg "Start Building [$toolset, $platform, $config] ($i/$count)"
+            $env:BOOST_LIBRARYDIR="$BoostRoot\lib$bitness-msvc-$vsVer"
 
             # CMake and MsBuid parameters.
 
             $generator = "Visual Studio " + $toolset.Substring(1, 2)
-            $vsVer = $toolset.Substring(1, 2) + ".0"
 
             if ($platform -eq "x64") {
                 $generator += " Win64"
