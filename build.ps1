@@ -83,6 +83,10 @@ if (Test-Path $buildBaseDir) {
     Remove-Item -Path $buildBaseDir -Recurse -Force
 }
 
+New-Item -Path $buildBaseDir -ItemType directory | Out-Null
+Remove-Item (Join-Path $thisDir "*.nuspec")
+Remove-Item (Join-Path $thisDir "*.nupkg")
+
 # Check TagLib version.
 
 $fileName = Join-Path $taglibDir "taglib\toolkit\taglib.h"
@@ -113,12 +117,15 @@ if ($lines.Length -ne 377 `
     exit
 }
 
+$headers = @()
 foreach ($header in $lines[39..142])
 {
     if ($header -eq '${CMAKE_CURRENT_BINARY_DIR}/../taglib_config.h') {
         # Skip it. taglib_config.h is no longer used.
     }
     else {
+        $header = $header -Replace "/", "\"
+
         $src = Join-Path $headerSrcDir $header
         $dst = Join-Path $headerDstDir $header
         $dir = Split-Path $dst -Parent
@@ -126,18 +133,27 @@ foreach ($header in $lines[39..142])
             New-Item -Path $dir -ItemType directory | Out-Null
         }
         Copy-Item $src $dst
+
+        $headers += "        <file src=`"package\lib\native\include\$header`" target=`"lib\native\include\$header`" />"
     }
 }
 
-# Begin creating the targets file.
+# Create the nuspec file for the header-only package.
+
+$content = (Get-Content -Path (Join-Path $thisDir "taglibcpp.nuspec.template") -Encoding UTF8)
+$content = $content -Replace "{{version}}", $settings.package.version
+$content = $content -Replace "{{headers}}", ($headers -Join "`n")
+$content | Set-Content -Path (Join-Path $thisDir "taglibcpp.nuspec") -Encoding UTF8
+
+$metadata = ([xml]$content).package.metadata
+
+# Create the targets file for the header-only package.
 
 $targetsContent = @"
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 "@
-
-# Add include paths to the targets file.
 
 $targetsContent += @"
   <ItemDefinitionGroup>
@@ -169,9 +185,16 @@ $targetsContent += @"
 %(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
-  <Target Name="TagLib_AfterBuild" AfterTargets="AfterBuild" />
+</Project>
 
 "@
+
+[System.IO.File]::WriteAllText( `
+    (Join-Path $buildBaseDir "taglibcpp.targets"), $targetsContent)
+
+# Build the header-only package.
+
+NuGet pack (Join-Path $thisDir "taglibcpp.nuspec")
 
 # Go through all the platforms, toolsets and configurations.
 
@@ -180,6 +203,22 @@ $i = 1
 
 :toolset foreach ($toolset in $Toolsets)
 {
+    # Create the nuspec file for each toolset.
+
+    $content = (Get-Content -Path (Join-Path $thisDir "taglibcpp-bin.nuspec.template") -Encoding UTF8)
+    $content = $content -Replace "{{version}}", $settings.package.version
+    $content = $content -Replace "{{toolset}}", $toolset
+    $content | Set-Content -Path (Join-Path $thisDir "taglibcpp-$toolset.nuspec") -Encoding UTF8
+
+    # Begin creating the targets file for each toolset.
+
+    $targetsContent = @"
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="TagLib_AfterBuild" AfterTargets="AfterBuild" />
+
+"@
+
     foreach ($platform in $Platforms)
     {
         $dirName = "$platform-$toolset".ToLower()
@@ -296,7 +335,6 @@ $i = 1
             # Add a reference to the binary files to the targets file.
 
             $condition  = "'`$(Platform.ToLower())' == '" + $platform.ToLower() + "' "
-            $condition += "And (`$(PlatformToolset.ToLower().IndexOf('" + $toolset.ToLower() + "')) == 0) "
             $condition += "And (`$(Configuration.ToLower().IndexOf('debug')) "
             if ($config -eq "Debug") {
                 $condition += "&gt; "
@@ -306,7 +344,7 @@ $i = 1
             }
             $condition += "-1)"
 
-            $label = "$toolset-$platform-$config".ToLower()
+            $label = "${platform}_${config}".ToLower()
             $libPath = "..\..\lib\native\lib\$dirName\taglib$suffix.lib"
             $dllPath = "..\..\lib\native\bin\$dirName\taglib$suffix.dll"
 
@@ -318,22 +356,35 @@ $i = 1
   </ItemDefinitionGroup>
   <Target Name="TagLib_AfterBuild_$label" Label="$label" Condition="$Condition" AfterTargets="TagLib_AfterBuild">
     <Copy SourceFiles="`$(MSBuildThisFileDirectory)$dllPath" DestinationFolder="`$(TargetDir)" SkipUnchangedFiles="true" />
+
+"@
+
+            if ($config -eq "Debug") {
+                $targetsContent += @"
+    <Copy SourceFiles="`$(MSBuildThisFileDirectory)$pdbPath" DestinationFolder="`$(TargetDir)" SkipUnchangedFiles="true" />
+"@
+            }
+
+            $targetsContent += @"
   </Target>
 
 "@
             $i++;
         }
     }
-}
 
-# Finish creating the targets file.
+    # Finish creating the targets file.
 
-$targetsContent += @"
+    $targetsContent += @"
 </Project>
 
 "@
 
-New-Item -Path $buildBaseDir -ItemType directory | Out-Null
-[System.IO.File]::WriteAllText( `
-    (Join-Path $buildBaseDir "taglibcpp.targets"), $targetsContent)
+    [System.IO.File]::WriteAllText( `
+        (Join-Path $buildBaseDir "taglibcpp-$toolset.targets"), $targetsContent)
+
+    # Build the binary package for each toolset.
+
+    NuGet pack (Join-Path $thisDir "taglibcpp-$toolset.nuspec")
+}
 

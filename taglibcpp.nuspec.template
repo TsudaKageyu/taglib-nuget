@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>taglibcpp</id>
+        <version>{{version}}</version>
+        <title>TagLib (Native)</title>
+        <authors>Tsuda Kageyu,TagLib Team</authors>
+        <owners>Scott Wheeler,Lukáš Lalinský,et al</owners>
+        <projectUrl>http://taglib.github.io/</projectUrl>
+        <iconUrl>http://tsudakageyu.github.io/taglib-nuget/assets/icon.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <summary>TagLib is a library for reading and editing the meta-data of several popular audio formats.</summary>
+        <description>TagLib is a library for reading and editing the meta-data of several popular audio formats. Currently it supports both ID3v1 and ID3v2 for MP3 files, Ogg Vorbis comments and ID3 tags and Vorbis comments in FLAC, MPC, Speex, WavPack TrueAudio, WAV, AIFF, MP4 and ASF files.
+
+TagLib is distributed under the GNU Lesser General Public License (http://www.gnu.org/licenses/lgpl.html) and Mozilla Public License (http://www.mozilla.org/MPL/MPL-1.1.html).</description>
+        <releaseNotes>This release is based on TagLib v1.11.</releaseNotes>
+        <copyright>Copyright © 2002-2016 Scott Wheeler, et al. All right reserved.</copyright>
+        <language>en-US</language>
+        <tags>c++ native audio tag id3 v100 v110 v120 v140 Win32 x64</tags>
+    </metadata>
+    <files>
+        <file src="package\build\native\taglibcpp.targets" target="build\native\taglibcpp.targets" />
+{{headers}}
+    </files>
+</package>

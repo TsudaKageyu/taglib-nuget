@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>taglibcpp-{{toolset}}</id>
+        <version>{{version}}</version>
+        <title>TagLib (Native) for Toolset {{toolset}}</title>
+        <authors>Tsuda Kageyu,TagLib Team</authors>
+        <owners>Scott Wheeler,Lukáš Lalinský,et al</owners>
+        <projectUrl>http://taglib.github.io/</projectUrl>
+        <iconUrl>http://tsudakageyu.github.io/taglib-nuget/assets/icon.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <summary>TagLib is a library for reading and editing the meta-data of several popular audio formats.</summary>
+        <description>TagLib is a library for reading and editing the meta-data of several popular audio formats. Currently it supports both ID3v1 and ID3v2 for MP3 files, Ogg Vorbis comments and ID3 tags and Vorbis comments in FLAC, MPC, Speex, WavPack TrueAudio, WAV, AIFF, MP4 and ASF files.
+
+TagLib is distributed under the GNU Lesser General Public License (http://www.gnu.org/licenses/lgpl.html) and Mozilla Public License (http://www.mozilla.org/MPL/MPL-1.1.html).</description>
+        <releaseNotes>This release is based on TagLib v1.11.</releaseNotes>
+        <copyright>Copyright © 2002-2016 Scott Wheeler, et al. All right reserved.</copyright>
+        <language>en-US</language>
+        <dependencies>
+            <group>
+                <dependency id="taglibcpp" version="[{{version}}]" />
+            </group>
+          </dependencies>
+        <tags>c++ native audio tag id3 {{toolset}} Win32 x64</tags>
+    </metadata>
+    <files>
+        <file src="package\build\native\taglibcpp-{{toolset}}.targets" target="build\native\taglibcpp-{{toolset}}.targets" />
+        <file src="package\lib\native\bin\win32-{{toolset}}\taglib.dll" target="lib\native\bin\win32-{{toolset}}\taglib.dll" />
+        <file src="package\lib\native\bin\win32-{{toolset}}\taglibd.dll" target="lib\native\bin\win32-{{toolset}}\taglibd.dll" />
+        <file src="package\lib\native\bin\win32-{{toolset}}\taglibd.pdb" target="lib\native\bin\win32-{{toolset}}\taglibd.pdb" />
+        <file src="package\lib\native\bin\x64-{{toolset}}\taglib.dll" target="lib\native\bin\x64-{{toolset}}\taglib.dll" />
+        <file src="package\lib\native\bin\x64-{{toolset}}\taglibd.dll" target="lib\native\bin\x64-{{toolset}}\taglibd.dll" />
+        <file src="package\lib\native\bin\x64-{{toolset}}\taglibd.pdb" target="lib\native\bin\x64-{{toolset}}\taglibd.pdb" />
+        <file src="package\lib\native\lib\win32-{{toolset}}\taglib.lib" target="lib\native\lib\win32-{{toolset}}\taglib.lib" />
+        <file src="package\lib\native\lib\win32-{{toolset}}\taglibd.lib" target="lib\native\lib\win32-{{toolset}}\taglibd.lib" />
+        <file src="package\lib\native\lib\x64-{{toolset}}\taglib.lib" target="lib\native\lib\x64-{{toolset}}\taglib.lib" />
+        <file src="package\lib\native\lib\x64-{{toolset}}\taglibd.lib" target="lib\native\lib\x64-{{toolset}}\taglibd.lib" />
+    </files>
+</package>
