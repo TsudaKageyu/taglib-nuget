@@ -22,8 +22,6 @@ Set-Variable -Name Configs -Option Constant -Value @(
     "Debug", "Release"
 )
 
-Set-Variable -Name BoostRoot -Option Constant -Value "C:\boost_1_62_0"
-
 ################################################################################
 # Functions
 
@@ -52,11 +50,13 @@ function execute($exe, $params, $dir)
 
 $thisDir = Split-Path $script:myInvocation.MyCommand.path -Parent
 
+# Read the settings.
+
+$settings = ([XML](Get-Content (Join-Path $thisDir "settings.xml"))).settings
+
 # Locate the necessary files.
 
-$msbuildExe = Join-Path ([Environment]::GetFolderPath('ProgramFilesX86')) "MSBuild\14.0\Bin\MSBuild.exe"
-
-if (-not (Test-Path $msbuildExe)) {
+if (-not (Test-Path $settings.msbuild_exe)) {
     showMsg("MsBuild.exe not found!")
     exit
 }
@@ -196,8 +196,8 @@ $i = 1
 
             $vsVer = $toolset.Substring(1, 2) + ".0"
 
-            $env:BOOST_ROOT="$BoostRoot"
-            $env:BOOST_INCLUDEDIR="$BoostRoot\boost"
+            $env:BOOST_ROOT = $settings.boost_root
+            $env:BOOST_INCLUDEDIR = Join-Path $settings.boost_root "boost"
 
             if ($platform -eq "x64") {
               $bitness = "64"
@@ -206,7 +206,7 @@ $i = 1
               $bitness = "32"
             }
 
-            $env:BOOST_LIBRARYDIR="$BoostRoot\lib$bitness-msvc-$vsVer"
+            $env:BOOST_LIBRARYDIR = Join-Path $settings.boost_root "lib$bitness-msvc-$vsVer"
 
             # CMake and MsBuid parameters.
 
@@ -247,7 +247,7 @@ $i = 1
             $params += "-DCMAKE_CXX_FLAGS_RELEASE=""/MD /GL /O2 /Ob2 /D NDEBUG"" "
             $params += "-DBUILD_SHARED_LIBS=on "
             $params += """$taglibDir"" "
-            execute "cmake.exe" $params $workDir
+            execute $settings.cmake_exe $params $workDir
             $taglibProject = Join-Path $workDir "taglib\tag.vcxproj"
 
             $content = (Get-Content -Path $taglibProject -Encoding UTF8)
@@ -273,7 +273,7 @@ $i = 1
             $params += "/p:VisualStudioVersion=$vsVer "
             $params += "/p:Configuration=$config "
             $params += "/p:TargetName=taglib$suffix "
-            execute $msbuildExe $params $workDir
+            execute $settings.msbuild_exe $params $workDir
 
             # Copy necessary files
 
