@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <settings>
   <package>
-    <version>1.11</version>
+    <version>1.11.2</version>
   </package>
   <boost_root>C:\boost_1_62_0</boost_root>
   <cmake_exe>C:\Program Files\CMake\bin\CMake.exe</cmake_exe>
