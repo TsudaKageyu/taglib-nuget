@@ -6,8 +6,8 @@
         <title>TagLib (Native)</title>
         <authors>Tsuda Kageyu,TagLib Team</authors>
         <owners>Scott Wheeler,Lukáš Lalinský,et al</owners>
-        <projectUrl>http://taglib.github.io/</projectUrl>
-        <iconUrl>http://tsudakageyu.github.io/taglib-nuget/assets/icon.png</iconUrl>
+        <projectUrl>http://taglib.org/</projectUrl>
+        <iconUrl>http://taglib.org/images/taglib-opaque.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <summary>TagLib is a library for reading and editing the meta-data of several popular audio formats.</summary>
         <description>TagLib is a library for reading and editing the meta-data of several popular audio formats. Currently it supports both ID3v1 and ID3v2 for MP3 files, Ogg Vorbis comments and ID3 tags and Vorbis comments in FLAC, MPC, Speex, WavPack TrueAudio, WAV, AIFF, MP4 and ASF files.
