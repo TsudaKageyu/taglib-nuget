@@ -95,7 +95,7 @@ $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 if ($lines.Length -ne 170 `
     -or $lines[30] -ne '#define TAGLIB_MAJOR_VERSION 1' `
     -or $lines[31] -ne '#define TAGLIB_MINOR_VERSION 11' `
-    -or $lines[32] -ne '#define TAGLIB_PATCH_VERSION 0')
+    -or $lines[32] -ne '#define TAGLIB_PATCH_VERSION 1')
 {
     showMsg "TagLib version mismatch!"
     exit
