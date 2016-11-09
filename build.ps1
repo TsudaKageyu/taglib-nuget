@@ -347,6 +347,7 @@ $i = 1
             $label = "${platform}_${config}".ToLower()
             $libPath = "..\..\lib\native\lib\$dirName\taglib$suffix.lib"
             $dllPath = "..\..\lib\native\bin\$dirName\taglib$suffix.dll"
+            $pdbPath = "..\..\lib\native\bin\$dirName\taglib$suffix.pdb"
 
             $targetsContent += @"
   <ItemDefinitionGroup Label="$label" Condition="$condition">
