@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 # MSBuild Settings
 
 Set-Variable -Name Toolsets -Option Constant -Value @(
-    "v100", "v110", "v120", "v140"
+    "v100", "v110", "v120", "v140", "v141"
 )
 
 Set-Variable -Name Platforms -Option Constant -Value @(
@@ -249,7 +249,7 @@ $i = 1
 
             # CMake and MsBuid parameters.
 
-            $generator = "Visual Studio " + $toolset.Substring(1, 2)
+            $generator = "Visual Studio 15"
 
             if ($platform -eq "x64") {
                 $generator += " Win64"
