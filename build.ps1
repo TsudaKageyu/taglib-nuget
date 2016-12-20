@@ -109,7 +109,7 @@ $headerDstDir = Join-Path $libBaseDir "include"
 $fileName = Join-Path $taglibDir "taglib\CMakeLists.txt"
 $lines = (Get-Content -Path $fileName -Encoding UTF8).Trim()
 
-if ($lines.Length -ne 377 `
+if ($lines.Length -ne 375 `
     -or $lines[38]  -ne "set(tag_HDRS" `
     -or $lines[143] -ne ")")
 {
@@ -285,7 +285,9 @@ $i = 1
             $params += "-DCMAKE_CXX_FLAGS_DEBUG=""/D_DEBUG /MDd /Zi /Ob0 /Od /RTC1"" "
             $params += "-DCMAKE_CXX_FLAGS_RELEASE=""/MD /GL /O2 /Ob2 /D NDEBUG"" "
             $params += "-DBUILD_SHARED_LIBS=on "
+            $params += "-DZLIB_SOURCE=""$zlibDirC"" "
             $params += """$taglibDir"" "
+
             execute $settings.cmake_exe $params $workDir
             $taglibProject = Join-Path $workDir "taglib\tag.vcxproj"
 
