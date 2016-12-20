@@ -235,17 +235,12 @@ $i = 1
 
             $vsVer = $toolset.Substring(1, 2) + ".0"
 
-            $env:BOOST_ROOT = $settings.boost_root
-            $env:BOOST_INCLUDEDIR = Join-Path $settings.boost_root "boost"
-
             if ($platform -eq "x64") {
               $bitness = "64"
             }
             else {
               $bitness = "32"
             }
-
-            $env:BOOST_LIBRARYDIR = Join-Path $settings.boost_root "lib$bitness-msvc-$vsVer"
 
             # CMake and MsBuid parameters.
 
@@ -280,7 +275,6 @@ $i = 1
 
             $params  = "-G ""$generator"" "
             $params += "-T ""$toolset$toolsetSuffix"" "
-            $params += "-DBoost_USE_STATIC_LIBS=on "
             $params += "-DCMAKE_CXX_FLAGS=""/DWIN32 /D_WINDOWS /DUNICODE /D_UNICODE /D_WIN32_WINNT=0x0501 /W0 /GR /EHsc $archFlag /MP "" "
             $params += "-DCMAKE_CXX_FLAGS_DEBUG=""/D_DEBUG /MDd /Zi /Ob0 /Od /RTC1"" "
             $params += "-DCMAKE_CXX_FLAGS_RELEASE=""/MD /GL /O2 /Ob2 /D NDEBUG"" "
